@@ -1,0 +1,23 @@
+name: build
+
+on:
+  push:
+    branches:
+      - develop
+      - main
+      - releases/*
+  pull_request:
+  schedule:
+    - cron: '30 6 * * 1'
+
+jobs:
+  build:
+    name: Build
+    runs-on: macos-12
+    steps:
+      - name: Checkout the repo
+        uses: actions/checkout@v3
+        with:
+            submodules: 'recursive'
+      - name: Build library
+        run: ./scripts/test-build.sh script -v2
