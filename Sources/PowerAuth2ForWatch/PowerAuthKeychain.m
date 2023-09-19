@@ -315,7 +315,7 @@ static PowerAuthBiometricAuthenticationType _LABiometryTypeToPAType(LABiometryTy
  Private function returns full information about biometric support on the system. The method internally
  uses `LAContext.canEvaluatePolicy()`.
  */
-static PowerAuthBiometricAuthenticationInfo _getBiometryInfo()
+static PowerAuthBiometricAuthenticationInfo _getBiometryInfo(void)
 {
     PowerAuthBiometricAuthenticationInfo info = { PowerAuthBiometricAuthenticationStatus_NotSupported, PowerAuthBiometricAuthenticationType_None };
     LAContext * context = [[LAContext alloc] init];
@@ -549,84 +549,6 @@ static BOOL _AddAccessControlObject(NSMutableDictionary * dictionary, BOOL isAdd
         default:
             return PowerAuthKeychainStoreItemResult_Other;
     }
-}
-
-@end
-
-// MARK: - Deprecated implementation
-
-@implementation PowerAuthKeychain (Deprecated)
-
-- (void) addValue:(NSData*)data forKey:(NSString*)key completion:(void(^)(PowerAuthKeychainStoreItemResult status))completion
-{
-    [self addValue:data forKey:key access:PowerAuthKeychainItemAccess_None completion:completion];
-}
-
-- (void) addValue:(NSData*)data forKey:(NSString*)key access:(PowerAuthKeychainItemAccess)access completion:(void(^)(PowerAuthKeychainStoreItemResult status))completion
-{
-    [self containsDataForKey:key completion:^(BOOL containsValue) {
-        if (containsValue) {
-            completion(PowerAuthKeychainStoreItemResult_Duplicate);
-        } else {
-            completion([self implAddValue:data forKey:key access:access]);
-        }
-    }];
-}
-
-- (void)updateValue:(NSData *)data forKey:(NSString *)key completion:(void (^)(PowerAuthKeychainStoreItemResult))completion
-{
-    [self containsDataForKey:key completion:^(BOOL containsValue) {
-        if (containsValue) {
-            completion([self implUpdateValue:data forKey:key]);
-        } else {
-            completion(PowerAuthKeychainStoreItemResult_NotFound);
-        }
-    }];
-}
-
-- (void) deleteDataForKey:(NSString*)key completion:(void(^)(BOOL deleted))completion
-{
-    dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        completion([self deleteDataForKey:key]);
-    });
-}
-
-- (NSData*) dataForKey:(NSString *)key status:(OSStatus *)status prompt:(NSString*)prompt
-{
-    PowerAuthKeychainAuthentication * auth = [[PowerAuthKeychainAuthentication alloc] initWithPrompt:prompt];
-    return [self dataForKey:key status:status authentication:auth];
-}
-
-- (void) dataForKey:(NSString*)key prompt:(NSString*)prompt completion:(void(^)(NSData *data, OSStatus status))completion
-{
-    dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        OSStatus status;
-        NSData *value = [self dataForKey:key status:&status prompt:prompt];
-        completion(value, status);
-    });
-}
-
-- (void) dataForKey:(NSString*)key completion:(void(^)(NSData *data, OSStatus status))completion
-{
-    dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        OSStatus status;
-        NSData *value = [self dataForKey:key status:&status];
-        completion(value, status);
-    });
-}
-
-- (void) containsDataForKey:(NSString*)key completion:(void(^)(BOOL containsValue))completion
-{
-    dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        BOOL containsValue = [self containsDataForKey:key];
-        completion(containsValue);
-    });
-}
-
-- (NSDictionary*) allItemsWithPrompt:(NSString*)prompt withStatus: (OSStatus *)status
-{
-    PowerAuthKeychainAuthentication * auth = [[PowerAuthKeychainAuthentication alloc] initWithPrompt:prompt];
-    return [self allItemsWithAuthentication:auth withStatus:status];
 }
 
 @end

@@ -30,9 +30,6 @@
     NSInteger _objectUsage;
 }
 
-#define AUTH_FOR_COMMIT         1
-#define AUTH_FOR_SIGN           2
-
 - (id) initWithObjectUsage:(NSInteger)objectUsage
                   password:(NSString*)password
                   biometry:(BOOL)biometry
@@ -55,24 +52,6 @@
     return self;
 }
 
-- (id) copyWithZone:(NSZone *)zone
-{
-    PowerAuthAuthentication * copy = [[[self class] allocWithZone:zone] init];
-    if (copy) {
-        copy->_objectUsage = _objectUsage;
-        copy->_usePossession = _usePossession;
-        copy->_useBiometry = _useBiometry;
-        copy->_password = _password;
-        copy->_biometryPrompt = _biometryPrompt;
-        copy->_overridenPossessionKey = _overridenPossessionKey;
-        copy->_overridenBiometryKey = _overridenBiometryKey;
-#if PA2_HAS_LACONTEXT == 1
-        copy->_biometryContext = _biometryContext;
-#endif
-    }
-    return copy;
-}
-
 - (PowerAuthKeychainAuthentication *) keychainAuthentication
 {
 #if PA2_HAS_LACONTEXT == 1
@@ -90,12 +69,10 @@
 - (NSString*) description
 {
     NSString * usage_str;
-    if (_objectUsage == AUTH_FOR_SIGN) {
-        usage_str = @"for sign";
-    } else if (_objectUsage == AUTH_FOR_COMMIT) {
-        usage_str = @"for commit";
+    if (_objectUsage == 0) {
+        usage_str = @" legacy";
     } else {
-        usage_str = @"legacy";
+        usage_str = @"";
     }
     NSMutableArray * factors = [NSMutableArray arrayWithCapacity:3];
     if (_usePossession) {
@@ -124,21 +101,9 @@
         [info addObject:@"+extPK"];
     }
     NSString * info_str = info.count == 0 ? @"" : [@", " stringByAppendingString:[info componentsJoinedByString:@" "]];
-    return [NSString stringWithFormat:@"<PowerAuthAuthentication %@: %@%@>", usage_str, factors_str, info_str];
+    return [NSString stringWithFormat:@"<PowerAuthAuthentication%@: %@%@>", usage_str, factors_str, info_str];
 }
 #endif
-
-// PA2_DEPRECATED(1.7.2)
-- (void) setUsePassword:(NSString *)usePassword
-{
-    _password = usePassword;
-}
-
-// PA2_DEPRECATED(1.7.2)
-- (NSString*) usePassword
-{
-    return _password;
-}
 
 @end
 
@@ -149,7 +114,7 @@
 
 + (PowerAuthAuthentication *) possession
 {
-    return [[PowerAuthAuthentication alloc] initWithObjectUsage:AUTH_FOR_SIGN
+    return [[PowerAuthAuthentication alloc] initWithObjectUsage:1
                                                        password:nil
                                                        biometry:NO
                                                  biometryPrompt:nil
@@ -160,7 +125,7 @@
 
 + (PowerAuthAuthentication *) possessionWithCustomPossessionKey:(NSData*)customPossessionKey
 {
-    return [[PowerAuthAuthentication alloc] initWithObjectUsage:AUTH_FOR_SIGN
+    return [[PowerAuthAuthentication alloc] initWithObjectUsage:1
                                                        password:nil
                                                        biometry:NO
                                                  biometryPrompt:nil
@@ -173,7 +138,7 @@
 
 + (PowerAuthAuthentication *) possessionWithBiometry
 {
-    return [[PowerAuthAuthentication alloc] initWithObjectUsage:AUTH_FOR_SIGN
+    return [[PowerAuthAuthentication alloc] initWithObjectUsage:1
                                                        password:nil
                                                        biometry:YES
                                                  biometryPrompt:nil
@@ -184,7 +149,7 @@
 
 + (PowerAuthAuthentication *) possessionWithBiometryPrompt:(NSString*)biometryPrompt
 {
-    return [[PowerAuthAuthentication alloc] initWithObjectUsage:AUTH_FOR_SIGN
+    return [[PowerAuthAuthentication alloc] initWithObjectUsage:1
                                                        password:nil
                                                        biometry:YES
                                                  biometryPrompt:biometryPrompt
@@ -196,7 +161,7 @@
 + (PowerAuthAuthentication *) possessionWithBiometryPrompt:(NSString*)biometryPrompt
                                        customPossessionKey:(NSData*)customPossessionKey
 {
-    return [[PowerAuthAuthentication alloc] initWithObjectUsage:AUTH_FOR_SIGN
+    return [[PowerAuthAuthentication alloc] initWithObjectUsage:1
                                                        password:nil
                                                        biometry:YES
                                                  biometryPrompt:biometryPrompt
@@ -208,7 +173,7 @@
 + (PowerAuthAuthentication *) possessionWithBiometryWithCustomBiometryKey:(NSData*)customBiometryKey
                                                       customPossessionKey:(NSData*)customPossessionKey
 {
-    return [[PowerAuthAuthentication alloc] initWithObjectUsage:AUTH_FOR_SIGN
+    return [[PowerAuthAuthentication alloc] initWithObjectUsage:1
                                                        password:nil
                                                        biometry:YES
                                                  biometryPrompt:nil
@@ -220,7 +185,7 @@
 #if PA2_HAS_LACONTEXT == 1
 + (PowerAuthAuthentication *) possessionWithBiometryContext:(LAContext *)context
 {
-    return [[PowerAuthAuthentication alloc] initWithObjectUsage:AUTH_FOR_SIGN
+    return [[PowerAuthAuthentication alloc] initWithObjectUsage:1
                                                        password:nil
                                                        biometry:YES
                                                  biometryPrompt:nil
@@ -231,7 +196,7 @@
 + (PowerAuthAuthentication *) possessionWithBiometryContext:(LAContext*)context
                                         customPossessionKey:(NSData*)customPossessionKey
 {
-    return [[PowerAuthAuthentication alloc] initWithObjectUsage:AUTH_FOR_SIGN
+    return [[PowerAuthAuthentication alloc] initWithObjectUsage:1
                                                        password:nil
                                                        biometry:YES
                                                  biometryPrompt:nil
@@ -245,7 +210,7 @@
 
 + (PowerAuthAuthentication *) possessionWithPassword:(NSString *)password
 {
-    return [[PowerAuthAuthentication alloc] initWithObjectUsage:AUTH_FOR_SIGN
+    return [[PowerAuthAuthentication alloc] initWithObjectUsage:1
                                                        password:password
                                                        biometry:NO
                                                  biometryPrompt:nil
@@ -257,7 +222,7 @@
 + (PowerAuthAuthentication *) possessionWithPassword:(NSString*)password
                                  customPossessionKey:(NSData*)customPossessionKey
 {
-    return [[PowerAuthAuthentication alloc] initWithObjectUsage:AUTH_FOR_SIGN
+    return [[PowerAuthAuthentication alloc] initWithObjectUsage:1
                                                        password:password
                                                        biometry:NO
                                                  biometryPrompt:nil
@@ -266,18 +231,6 @@
                                               customBiometryKey:nil];
 }
 
-#pragma mark - Deprecated
-
-// PA2_DEPRECATED(1.7.0)
-+ (PowerAuthAuthentication *) possessionWithBiometryWithPrompt:(NSString *)biometryPrompt
-{
-    return [self possessionWithBiometryPrompt:biometryPrompt];
-}
-// PA2_DEPRECATED(1.7.0)
-+ (PowerAuthAuthentication *) possessionWithPasswordDeprecated:(NSString*)password
-{
-    return [self possessionWithPassword:password];
-}
 @end
 
 
@@ -296,14 +249,6 @@
 {
     if (_objectUsage == 0) {
         PowerAuthLog(@"WARNING: Using PowerAuthAuthentication object created with legacy constructor.");
-        return NO;
-    }
-    if (forCommit != (_objectUsage == AUTH_FOR_COMMIT)) {
-        if (forCommit) {
-            PowerAuthLog(@"WARNING: Using PowerAuthAuthentication object for a different purpose. The object for activation commit is expected.");
-        } else {
-            PowerAuthLog(@"WARNING: Using PowerAuthAuthentication object for a different purpose. The object for signature calculation is expected.");
-        }
         return NO;
     }
     return YES;

@@ -1,5 +1,5 @@
 /**
- * Copyright 2021 Wultra s.r.o.
+ * Copyright 2023 Wultra s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,29 +19,33 @@
 
 #import <PowerAuth2ForWatch/PowerAuthSharingConfiguration.h>
 
-/** Class that represents a PowerAuthSDK instance configuration.
+/** Class that represents a PowerAuth2ForExtensions or PowerAuth2ForWatch instance configuration.
  */
 @interface PowerAuthConfiguration : NSObject<NSCopying>
 
+/// No longer available. Use `init(instanceId:baseEndpointUrl:configuration:)` instead.
+- (nonnull instancetype) init NS_UNAVAILABLE;
+
+/// Initialize object with all required parameters.
+/// - Parameters:
+///   - instanceId: Identifier of the PowerAuthSDK instance, used as a 'key' to store session state in the session state keychain.
+///   - baseEndpointUrl: Base URL to the PowerAuth Standard RESTful API (the URL part before "/pa/...").
+///   - configuration: String with the cryptographic configuration.
+- (nonnull instancetype) initWithInstanceId:(nonnull NSString*)instanceId
+                            baseEndpointUrl:(nonnull NSString*)baseEndpointUrl
+                              configuration:(nonnull NSString*)configuration;
+
 /** Identifier of the PowerAuthSDK instance, used as a 'key' to store session state in the session state keychain.
  */
-@property (nonatomic, strong, nonnull) NSString *instanceId;
+@property (nonatomic, strong, nonnull, readonly) NSString *instanceId;
 
 /** Base URL to the PowerAuth Standard RESTful API (the URL part before "/pa/...").
  */
-@property (nonatomic, strong, nonnull) NSString *baseEndpointUrl;
+@property (nonatomic, strong, nonnull, readonly) NSString *baseEndpointUrl;
 
-/** APPLICATION_KEY as defined in PowerAuth specification - a key identifying an application version.
+/** String with the cryptographic configuration.
  */
-@property (nonatomic, strong, nonnull) NSString *appKey;
-
-/** APPLICATION_SECRET as defined in PowerAuth specification - a secret associated with an application version.
- */
-@property (nonatomic, strong, nonnull) NSString *appSecret;
-
-/** KEY_SERVER_MASTER_PUBLIC as defined in PowerAuth specification - a master server public key.
- */
-@property (nonatomic, strong, nonnull) NSString *masterServerPublicKey;
+@property (nonatomic, strong, nonnull, readonly) NSString *configuration;
 
 /** This value specifies 'key' used to store this PowerAuthSDK instance biometry related key in the biometry key keychain.
  */
@@ -52,20 +56,13 @@
 @property (nonatomic, strong, nullable) NSData  *externalEncryptionKey;
 
 /**
- If set to YES, then PowerAuthSDK will not automatically upgrade activation to a newer protocol version.
- This option should be used only for the testing purposes.
- 
- Default and recommended value is `NO`.
- */
-@property (nonatomic, assign) BOOL disableAutomaticProtocolUpgrade;
-
-/**
  If set, then this instance of PowerAuthSDK can be shared between multiple vendor applications.
  */
 @property (nonatomic, strong, nullable) PowerAuthSharingConfiguration * sharingConfiguration;
 
 /** Validate that the configuration is properly set (all required values were filled in).
  */
-- (BOOL) validateConfiguration;
+- (BOOL) validateConfiguration
+            NS_SWIFT_NAME(validate());
 
 @end

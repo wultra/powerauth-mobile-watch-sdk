@@ -1,5 +1,5 @@
 /**
- * Copyright 2021 Wultra s.r.o.
+ * Copyright 2023 Wultra s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,17 +21,27 @@
 
 @implementation PowerAuthConfiguration
 
+- (id) initWithInstanceId:(NSString *)instanceId baseEndpointUrl:(NSString *)baseEndpointUrl configuration:(NSString *)configuration
+{
+    self = [super init];
+    if (self) {
+        _instanceId = instanceId;
+        _baseEndpointUrl = baseEndpointUrl;
+        _configuration = configuration;
+    }
+    return self;
+}
+
 - (BOOL) validateConfiguration
 {
     BOOL result = YES;
-    result = result && (_instanceId != nil);
-    result = result && (_appKey != nil);
-    result = result && (_appSecret != nil);
-    result = result && (_masterServerPublicKey != nil);
-    result = result && (_baseEndpointUrl != nil);
+    result = result && (_instanceId.length > 0);
+    result = result && (_baseEndpointUrl.length > 0);
     if (_sharingConfiguration) {
         result = result && [_sharingConfiguration validateConfiguration];
     }
+    // TODO:...
+    //result = result && [PowerAuthCoreSessionSetup validateConfiguration:_configuration];
     return result;
 }
 
@@ -41,12 +51,9 @@
     if (c) {
         c->_instanceId = _instanceId;
         c->_baseEndpointUrl = _baseEndpointUrl;
-        c->_appKey = _appKey;
-        c->_appSecret = _appSecret;
-        c->_masterServerPublicKey = _masterServerPublicKey;
+        c->_configuration = _configuration;
         c->_keychainKey_Biometry = _keychainKey_Biometry;
         c->_externalEncryptionKey = _externalEncryptionKey;
-        c->_disableAutomaticProtocolUpgrade = _disableAutomaticProtocolUpgrade;
         c->_sharingConfiguration = [_sharingConfiguration copy];
     }
     return c;
