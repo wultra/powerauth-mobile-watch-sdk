@@ -26,21 +26,16 @@
 #import "PowerAuthAuthentication+Private.h"
 
 @implementation PowerAuthAuthentication
-{
-    NSInteger _objectUsage;
-}
 
-- (id) initWithObjectUsage:(NSInteger)objectUsage
-                  password:(NSString*)password
-                  biometry:(BOOL)biometry
-            biometryPrompt:(NSString*)biometryPrompt
-           biometryContext:(id)biometryContext
-       customPossessionKey:(NSData*)customPossessionKey
-         customBiometryKey:(NSData*)customBiometryKey
+- (id) initWithPassword:(NSString*)password
+               biometry:(BOOL)biometry
+         biometryPrompt:(NSString*)biometryPrompt
+        biometryContext:(id)biometryContext
+    customPossessionKey:(NSData*)customPossessionKey
+      customBiometryKey:(NSData*)customBiometryKey
 {
     self = [super init];
     if (self) {
-        _objectUsage = objectUsage;
         _usePossession = YES;
         _password = password;
         _useBiometry = biometry;
@@ -68,12 +63,6 @@
 #if DEBUG
 - (NSString*) description
 {
-    NSString * usage_str;
-    if (_objectUsage == 0) {
-        usage_str = @" legacy";
-    } else {
-        usage_str = @"";
-    }
     NSMutableArray * factors = [NSMutableArray arrayWithCapacity:3];
     if (_usePossession) {
         [factors addObject:@"possession"];
@@ -101,7 +90,7 @@
         [info addObject:@"+extPK"];
     }
     NSString * info_str = info.count == 0 ? @"" : [@", " stringByAppendingString:[info componentsJoinedByString:@" "]];
-    return [NSString stringWithFormat:@"<PowerAuthAuthentication%@: %@%@>", usage_str, factors_str, info_str];
+    return [NSString stringWithFormat:@"<PowerAuthAuthentication: %@%@>", factors_str, info_str];
 }
 #endif
 
@@ -114,95 +103,87 @@
 
 + (PowerAuthAuthentication *) possession
 {
-    return [[PowerAuthAuthentication alloc] initWithObjectUsage:1
-                                                       password:nil
-                                                       biometry:NO
-                                                 biometryPrompt:nil
-                                                biometryContext:nil
-                                            customPossessionKey:nil
-                                              customBiometryKey:nil];
+    return [[PowerAuthAuthentication alloc] initWithPassword:nil
+                                                    biometry:NO
+                                              biometryPrompt:nil
+                                             biometryContext:nil
+                                         customPossessionKey:nil
+                                           customBiometryKey:nil];
 }
 
 + (PowerAuthAuthentication *) possessionWithCustomPossessionKey:(NSData*)customPossessionKey
 {
-    return [[PowerAuthAuthentication alloc] initWithObjectUsage:1
-                                                       password:nil
-                                                       biometry:NO
-                                                 biometryPrompt:nil
-                                                biometryContext:nil
-                                            customPossessionKey:customPossessionKey
-                                              customBiometryKey:nil];
+    return [[PowerAuthAuthentication alloc] initWithPassword:nil
+                                                    biometry:NO
+                                              biometryPrompt:nil
+                                             biometryContext:nil
+                                         customPossessionKey:customPossessionKey
+                                           customBiometryKey:nil];
 }
 
 // MARK: Signing, Possession + Biometry
 
 + (PowerAuthAuthentication *) possessionWithBiometry
 {
-    return [[PowerAuthAuthentication alloc] initWithObjectUsage:1
-                                                       password:nil
-                                                       biometry:YES
-                                                 biometryPrompt:nil
-                                                biometryContext:nil
-                                            customPossessionKey:nil
-                                              customBiometryKey:nil];
+    return [[PowerAuthAuthentication alloc] initWithPassword:nil
+                                                    biometry:YES
+                                              biometryPrompt:nil
+                                             biometryContext:nil
+                                         customPossessionKey:nil
+                                           customBiometryKey:nil];
 }
 
 + (PowerAuthAuthentication *) possessionWithBiometryPrompt:(NSString*)biometryPrompt
 {
-    return [[PowerAuthAuthentication alloc] initWithObjectUsage:1
-                                                       password:nil
-                                                       biometry:YES
-                                                 biometryPrompt:biometryPrompt
-                                                biometryContext:nil
-                                            customPossessionKey:nil
-                                              customBiometryKey:nil];
+    return [[PowerAuthAuthentication alloc] initWithPassword:nil
+                                                    biometry:YES
+                                              biometryPrompt:biometryPrompt
+                                             biometryContext:nil
+                                         customPossessionKey:nil
+                                           customBiometryKey:nil];
 }
 
 + (PowerAuthAuthentication *) possessionWithBiometryPrompt:(NSString*)biometryPrompt
                                        customPossessionKey:(NSData*)customPossessionKey
 {
-    return [[PowerAuthAuthentication alloc] initWithObjectUsage:1
-                                                       password:nil
-                                                       biometry:YES
-                                                 biometryPrompt:biometryPrompt
-                                                biometryContext:nil
-                                            customPossessionKey:customPossessionKey
-                                              customBiometryKey:nil];
+    return [[PowerAuthAuthentication alloc] initWithPassword:nil
+                                                    biometry:YES
+                                              biometryPrompt:biometryPrompt
+                                             biometryContext:nil
+                                         customPossessionKey:customPossessionKey
+                                           customBiometryKey:nil];
 }
 
 + (PowerAuthAuthentication *) possessionWithBiometryWithCustomBiometryKey:(NSData*)customBiometryKey
                                                       customPossessionKey:(NSData*)customPossessionKey
 {
-    return [[PowerAuthAuthentication alloc] initWithObjectUsage:1
-                                                       password:nil
-                                                       biometry:YES
-                                                 biometryPrompt:nil
-                                                biometryContext:nil
-                                            customPossessionKey:customPossessionKey
-                                              customBiometryKey:customBiometryKey];
+    return [[PowerAuthAuthentication alloc] initWithPassword:nil
+                                                    biometry:YES
+                                              biometryPrompt:nil
+                                             biometryContext:nil
+                                         customPossessionKey:customPossessionKey
+                                           customBiometryKey:customBiometryKey];
 }
 
 #if PA2_HAS_LACONTEXT == 1
 + (PowerAuthAuthentication *) possessionWithBiometryContext:(LAContext *)context
 {
-    return [[PowerAuthAuthentication alloc] initWithObjectUsage:1
-                                                       password:nil
-                                                       biometry:YES
-                                                 biometryPrompt:nil
-                                                biometryContext:context
-                                            customPossessionKey:nil
-                                              customBiometryKey:nil];
+    return [[PowerAuthAuthentication alloc] initWithPassword:nil
+                                                    biometry:YES
+                                              biometryPrompt:nil
+                                             biometryContext:context
+                                         customPossessionKey:nil
+                                           customBiometryKey:nil];
 }
 + (PowerAuthAuthentication *) possessionWithBiometryContext:(LAContext*)context
                                         customPossessionKey:(NSData*)customPossessionKey
 {
-    return [[PowerAuthAuthentication alloc] initWithObjectUsage:1
-                                                       password:nil
-                                                       biometry:YES
-                                                 biometryPrompt:nil
-                                                biometryContext:context
-                                            customPossessionKey:customPossessionKey
-                                              customBiometryKey:nil];
+    return [[PowerAuthAuthentication alloc] initWithPassword:nil
+                                                    biometry:YES
+                                              biometryPrompt:nil
+                                             biometryContext:context
+                                         customPossessionKey:customPossessionKey
+                                           customBiometryKey:nil];
 }
 #endif // PA2_HAS_LACONTEXT
 
@@ -210,25 +191,23 @@
 
 + (PowerAuthAuthentication *) possessionWithPassword:(NSString *)password
 {
-    return [[PowerAuthAuthentication alloc] initWithObjectUsage:1
-                                                       password:password
-                                                       biometry:NO
-                                                 biometryPrompt:nil
-                                                biometryContext:nil
-                                            customPossessionKey:nil
-                                              customBiometryKey:nil];
+    return [[PowerAuthAuthentication alloc] initWithPassword:password
+                                                    biometry:NO
+                                              biometryPrompt:nil
+                                             biometryContext:nil
+                                         customPossessionKey:nil
+                                           customBiometryKey:nil];
 }
 
 + (PowerAuthAuthentication *) possessionWithPassword:(NSString*)password
                                  customPossessionKey:(NSData*)customPossessionKey
 {
-    return [[PowerAuthAuthentication alloc] initWithObjectUsage:1
-                                                       password:password
-                                                       biometry:NO
-                                                 biometryPrompt:nil
-                                                biometryContext:nil
-                                            customPossessionKey:customPossessionKey
-                                              customBiometryKey:nil];
+    return [[PowerAuthAuthentication alloc] initWithPassword:password
+                                                    biometry:NO
+                                              biometryPrompt:nil
+                                             biometryContext:nil
+                                         customPossessionKey:customPossessionKey
+                                           customBiometryKey:nil];
 }
 
 @end
@@ -245,13 +224,10 @@
     return result;
 }
 
-- (BOOL) validateUsage:(BOOL)forCommit
+- (BOOL) validateUsage:(BOOL)forPersist
 {
-    if (_objectUsage == 0) {
-        PowerAuthLog(@"WARNING: Using PowerAuthAuthentication object created with legacy constructor.");
-        return NO;
-    }
-    return YES;
+    // Keep for compatibility with shared sources
+    return !forPersist;
 }
 
 @end

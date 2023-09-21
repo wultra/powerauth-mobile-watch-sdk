@@ -30,6 +30,9 @@
  */
 @interface PowerAuthAuthentication : NSObject
 
+/// No longer available. Use static methods instead.
+- (nonnull instancetype) init NS_UNAVAILABLE;
+
 /// Indicates if a possession factor should be used.
 @property (nonatomic, assign, readonly) BOOL usePossession;
 
