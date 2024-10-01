@@ -37,14 +37,6 @@
 @property (nonatomic, strong, nonnull, readonly) PowerAuthConfiguration * configuration;
 
 /**
- Contains activationId if counterpart session object on iPhone has a valid activation or nil if there's no
- such activation.
- 
- The property is deprecated, please use `activationIdentifier` as a replacement.
- */
-@property (nonatomic, strong, nullable, readonly) NSString * activationId PA2_DEPRECATED(1.7.0);
-
-/**
  A designated initializer.
  */
 - (nullable instancetype) initWithConfiguration:(nonnull PowerAuthConfiguration*)configuration;

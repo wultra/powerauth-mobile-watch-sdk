@@ -78,11 +78,6 @@
     return [_configuration copy];
 }
 
-- (NSString*) activationId
-{
-    return [[PA2WatchSynchronizationService sharedInstance] activationIdForSessionInstanceId:_configuration.instanceId];
-}
-
 - (NSString*) activationIdentifier
 {
     return [[PA2WatchSynchronizationService sharedInstance] activationIdForSessionInstanceId:_configuration.instanceId];
