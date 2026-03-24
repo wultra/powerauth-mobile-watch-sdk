@@ -83,6 +83,16 @@
     return [[PA2WatchSynchronizationService sharedInstance] activationIdForSessionInstanceId:_configuration.instanceId];
 }
 
+- (NSString*) powerAuthAlgorithm
+{
+    return [[PA2WatchSynchronizationService sharedInstance] activationStatusForSessionInstanceId:_configuration.instanceId].algorithm;
+}
+
+- (NSString*) powerAuthProtocolVersion
+{
+    return [[PA2WatchSynchronizationService sharedInstance] activationStatusForSessionInstanceId:_configuration.instanceId].protocolVersion;
+}
+
 - (id<PowerAuthTokenStore>) tokenStore
 {
     return _tokenStore;
@@ -164,8 +174,7 @@
             BOOL invalidPacket = YES;
             if ([status validatePacketData]) {
                 if ([status.command isEqualToString:PA2WCSessionPacket_CMD_SESSION_PUT]) {
-                    activationId = status.activationId;
-                    [[PA2WatchSynchronizationService sharedInstance] updateActivationId:activationId forSessionInstanceId:_configuration.instanceId];
+                    [[PA2WatchSynchronizationService sharedInstance] updateActivationStatus:status forSessionInstanceId:_configuration.instanceId];
                     invalidPacket = NO;
                 }
             }

@@ -29,13 +29,26 @@
 /**
  Computes SHA-256 from given data.
  */
-+ (nonnull NSData*) hashSha256:(nonnull NSData*)data;
++ (nullable NSData*) hashSha256:(nullable NSData*)data;
+
+/**
+ Computes SHA3-256 from given data.
+ */
++ (nullable NSData*) hashSha3_256:(nullable NSData*)data;
 
 /**
  Computes HMAC-SHA-256 for given data and key.
  */
-+ (nonnull NSData*) hmacSha256:(nonnull NSData*)data
-                           key:(nonnull NSData*)key;
++ (nullable NSData*) hmacSha256:(nullable NSData*)data
+                            key:(nonnull NSData*)key;
+
+/**
+ Computes KMAC-256 for given data and key.
+ **/
++ (nullable NSData*) kmac256:(nullable NSData*)data
+                         key:(nonnull NSData*)key
+                      custom:(nonnull NSData*)custom
+                        size:(NSUInteger)size;
 
 /**
  Generates a required amount of random bytes. Returns nil in case that

@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 77;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -77,7 +77,19 @@
 		BF86E8D7263C2BBF004C8AE5 /* PA2CoreCryptoUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = BF86E8D5263C2BBF004C8AE5 /* PA2CoreCryptoUtils.m */; };
 		BFC1929827FC694A001455C1 /* PowerAuthSharingConfiguration.h in Headers */ = {isa = PBXBuildFile; fileRef = BFC1929627FC694A001455C1 /* PowerAuthSharingConfiguration.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BFC1929927FC694A001455C1 /* PowerAuthSharingConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = BFC1929727FC694A001455C1 /* PowerAuthSharingConfiguration.m */; };
+		BFFC5E162F7160FF00A1411B /* PA2ActivationStatus.m in Sources */ = {isa = PBXBuildFile; fileRef = BFFC5E152F7160FF00A1411B /* PA2ActivationStatus.m */; };
+		BFFC5E172F7160FF00A1411B /* PA2ActivationStatus.h in Headers */ = {isa = PBXBuildFile; fileRef = BFFC5E142F7160FF00A1411B /* PA2ActivationStatus.h */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		BFFC5E0A2F6D85F200A1411B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BFFC5E062F6D6B5E00A1411B /* openssl.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = BFFC5DD82F6D62F800A1411B;
+			remoteInfo = OpenSSL;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		BF1ED078283D01CC00D6B380 /* PowerAuthKeychainAuthentication.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PowerAuthKeychainAuthentication.h; sourceTree = "<group>"; };
@@ -153,6 +165,9 @@
 		BF86E8D5263C2BBF004C8AE5 /* PA2CoreCryptoUtils.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PA2CoreCryptoUtils.m; sourceTree = "<group>"; };
 		BFC1929627FC694A001455C1 /* PowerAuthSharingConfiguration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PowerAuthSharingConfiguration.h; sourceTree = "<group>"; };
 		BFC1929727FC694A001455C1 /* PowerAuthSharingConfiguration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PowerAuthSharingConfiguration.m; sourceTree = "<group>"; };
+		BFFC5E062F6D6B5E00A1411B /* openssl.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = openssl.xcodeproj; path = "cc7/proj-xcode/openssl.xcodeproj"; sourceTree = "<group>"; };
+		BFFC5E142F7160FF00A1411B /* PA2ActivationStatus.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PA2ActivationStatus.h; sourceTree = "<group>"; };
+		BFFC5E152F7160FF00A1411B /* PA2ActivationStatus.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PA2ActivationStatus.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -177,6 +192,7 @@
 		BF86E805263C1DDF004C8AE5 = {
 			isa = PBXGroup;
 			children = (
+				BFFC5E062F6D6B5E00A1411B /* openssl.xcodeproj */,
 				BF86E81D263C1EBD004C8AE5 /* PowerAuth2ForWatch */,
 				BF86E810263C1DDF004C8AE5 /* Products */,
 			);
@@ -305,6 +321,8 @@
 				BF86E83B263C1EBD004C8AE5 /* PA2WCSessionPacket_Success.m */,
 				BF86E844263C1EBD004C8AE5 /* PA2WCSessionPacket_TokenData.h */,
 				BF86E837263C1EBD004C8AE5 /* PA2WCSessionPacket_TokenData.m */,
+				BFFC5E142F7160FF00A1411B /* PA2ActivationStatus.h */,
+				BFFC5E152F7160FF00A1411B /* PA2ActivationStatus.m */,
 			);
 			name = model;
 			sourceTree = "<group>";
@@ -316,6 +334,13 @@
 				BF86E852263C1EBE004C8AE5 /* Info.plist */,
 			);
 			name = support;
+			sourceTree = "<group>";
+		};
+		BFFC5E072F6D6B5E00A1411B /* Products */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -333,6 +358,7 @@
 				BF86E8B8263C2512004C8AE5 /* PowerAuthDeprecated.h in Headers */,
 				BF1ED0AE2844C3FD00D6B380 /* PA2SimpleCancelable.h in Headers */,
 				BFC1929827FC694A001455C1 /* PowerAuthSharingConfiguration.h in Headers */,
+				BFFC5E172F7160FF00A1411B /* PA2ActivationStatus.h in Headers */,
 				BF86E870263C1EBE004C8AE5 /* PA2WCSessionPacket.h in Headers */,
 				BF86E87D263C1EBE004C8AE5 /* PowerAuthWCSessionManager+Private.h in Headers */,
 				BF86E8D6263C2BBF004C8AE5 /* PA2CoreCryptoUtils.h in Headers */,
@@ -376,6 +402,7 @@
 			buildConfigurationList = BF86E817263C1DDF004C8AE5 /* Build configuration list for PBXNativeTarget "PowerAuth2ForWatch" */;
 			buildPhases = (
 				BF86E80A263C1DDF004C8AE5 /* Headers */,
+				BFFC5E182F717E0900A1411B /* [CC7] XCFramework extract */,
 				BF86E80B263C1DDF004C8AE5 /* Sources */,
 				BF86E80C263C1DDF004C8AE5 /* Frameworks */,
 				BF86E80D263C1DDF004C8AE5 /* Resources */,
@@ -383,6 +410,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				BFFC5E0B2F6D85F200A1411B /* PBXTargetDependency */,
 			);
 			name = PowerAuth2ForWatch;
 			productName = PowerAuth2ForWatch;
@@ -404,7 +432,6 @@
 				};
 			};
 			buildConfigurationList = BF86E809263C1DDF004C8AE5 /* Build configuration list for PBXProject "PowerAuth2ForWatch" */;
-			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -412,8 +439,16 @@
 				Base,
 			);
 			mainGroup = BF86E805263C1DDF004C8AE5;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
 			productRefGroup = BF86E810263C1DDF004C8AE5 /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = BFFC5E072F6D6B5E00A1411B /* Products */;
+					ProjectRef = BFFC5E062F6D6B5E00A1411B /* openssl.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				BF86E80E263C1DDF004C8AE5 /* PowerAuth2ForWatch */,
@@ -430,6 +465,28 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		BFFC5E182F717E0900A1411B /* [CC7] XCFramework extract */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "[CC7] XCFramework extract";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Prepare platform / architecture specific framework\n\"${PROJECT_DIR}/cc7/openssl-build/xcbuild-helper.sh\" \"${EFFECTIVE_PLATFORM_NAME}\" \"${BUILT_PRODUCTS_DIR}\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		BF86E80B263C1DDF004C8AE5 /* Sources */ = {
@@ -459,6 +516,7 @@
 				BF86E865263C1EBE004C8AE5 /* PowerAuthWCSessionManager_WatchServices.m in Sources */,
 				BFC1929927FC694A001455C1 /* PowerAuthSharingConfiguration.m in Sources */,
 				BF86E871263C1EBE004C8AE5 /* PA2WCSessionPacket_Success.m in Sources */,
+				BFFC5E162F7160FF00A1411B /* PA2ActivationStatus.m in Sources */,
 				BF86E85B263C1EBE004C8AE5 /* PowerAuthErrorConstants.m in Sources */,
 				BF86E886263C1EBE004C8AE5 /* PowerAuthWCSessionManager.m in Sources */,
 				BF86E8B0263C231B004C8AE5 /* PowerAuthToken.m in Sources */,
@@ -470,6 +528,14 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		BFFC5E0B2F6D85F200A1411B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = OpenSSL;
+			targetProxy = BFFC5E0A2F6D85F200A1411B /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		BF86E815263C1DDF004C8AE5 /* Debug */ = {
@@ -511,7 +577,7 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -528,11 +594,17 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/cc7/openssl-lib/apple/include";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)/cc7/openssl-lib/apple/";
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_LDFLAGS = (
+					"-framework",
+					openssl,
+				);
 				SDKROOT = watchos;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				TVOS_DEPLOYMENT_TARGET = 12.0;
@@ -581,7 +653,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -595,10 +667,16 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/cc7/openssl-lib/apple/include";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)/cc7/openssl-lib/apple/";
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				OTHER_LDFLAGS = (
+					"-framework",
+					openssl,
+				);
 				SDKROOT = watchos;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				TVOS_DEPLOYMENT_TARGET = 12.0;

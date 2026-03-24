@@ -70,4 +70,14 @@
  */
 @property (nonatomic, strong, nullable, readonly) NSString *activationIdentifier;
 
+/**
+ Read only property contains the current PowerAuth algorithm used in the activation. If object has no valid activation, then contains nil.
+ */
+@property (nonatomic, strong, nullable, readonly) NSString *powerAuthAlgorithm;
+
+/**
+ Read only property contains the current PowerAuth protocol version used in the activation. If object has no valid activation, then contains nil.
+ */
+@property (nonatomic, strong, nullable, readonly) NSString *powerAuthProtocolVersion;
+
 @end

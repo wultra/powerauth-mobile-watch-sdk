@@ -1,0 +1,4 @@
+[submodule "cc7"]
+	path = cc7
+	url = ../cc7.git
+	branch = develop

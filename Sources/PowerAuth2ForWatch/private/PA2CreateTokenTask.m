@@ -57,7 +57,8 @@
         if (tokenData && tokenStore) {
             tokenData.activationIdentifier = _activationId;
             tokenData.authenticationFactors = _authentication.signatureFactorMask;
-            token = [[PowerAuthToken alloc] initWithStore:tokenStore data:tokenData];
+            token = [[PowerAuthToken alloc] initWithStore:tokenStore
+                                                     data:tokenData];
         } else {
             token = nil;
             if (!error) {

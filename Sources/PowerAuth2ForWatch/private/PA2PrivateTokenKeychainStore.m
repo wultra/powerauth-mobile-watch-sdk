@@ -132,6 +132,16 @@
 
 #pragma mark - PowerAuthPrivateTokenStore protocol
 
+- (NSString*) protocolVersion
+{
+    return _statusProvider.powerAuthProtocolVersion;
+}
+
+- (NSString*) algorithm
+{
+    return _statusProvider.powerAuthAlgorithm;
+}
+
 - (BOOL) canGenerateHeaderForToken:(PowerAuthToken *)token
 {
     return [_statusProvider hasValidActivation] && [_statusProvider.activationIdentifier isEqualToString:token.privateTokenData.activationIdentifier];

@@ -6,7 +6,7 @@ Pod::Spec.new do |s|
     s.summary           = 'PowerAuth Mobile SDK for watchOS'
     s.homepage          = 'https://github.com/wultra/powerauth-mobile-sdk'
     s.social_media_url  = 'https://twitter.com/wultra'
-    s.documentation_url = 'https://developers.wultra.com/products/mobile-security-suite/develop/powerauth-mobile-sdk/PowerAuth-SDK-for-watchOS'
+    s.documentation_url = 'https://github.com/wultra/powerauth-mobile-sdk/blob/develop/docs/PowerAuth-SDK-for-watchOS.md'
     s.author            = { 
       'Wultra s.r.o.' => 'support@wultra.com'
     }
@@ -18,7 +18,8 @@ Pod::Spec.new do |s|
     # Source files
     s.source = { 
         :git => 'https://github.com/wultra/powerauth-mobile-watch-sdk.git',
-        :tag => "#{s.version}"
+        :tag => "#{s.version}",
+        :submodules => true
     }
     
     # Library build
