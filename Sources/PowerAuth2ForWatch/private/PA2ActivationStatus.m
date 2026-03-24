@@ -124,6 +124,14 @@ static NSString * const FALLBACK_PROTOCOL   = @"3.3";
     return [[PA2ActivationStatus alloc] init];
 }
 
+static BOOL _StringCompare(NSString * s1, NSString * s2)
+{
+    if (s1 == s2) {
+        return YES;
+    }
+    return [s1 isEqualToString:s2];
+}
+
 - (BOOL) isEqual:(id)object
 {
     if (object == self) {
@@ -136,9 +144,18 @@ static NSString * const FALLBACK_PROTOCOL   = @"3.3";
         return NO;
     }
     return _dataVersion == other->_dataVersion &&
-            [_activationId isEqualToString:other->_activationId] &&
-            [_algorithm isEqualToString:other->_algorithm] &&
-            [_protocolVersion isEqualToString:other->_protocolVersion];
+            _StringCompare(_activationId, other->_activationId) &&
+            _StringCompare(_algorithm, other->_algorithm) &&
+            _StringCompare(_protocolVersion, other->_protocolVersion);
+}
+
+- (NSUInteger) hash
+{
+    NSUInteger hash = _dataVersion;
+    hash = hash * 31u + _activationId.hash;
+    hash = hash * 31u + _algorithm.hash;
+    hash = hash * 31u + _protocolVersion.hash;
+    return hash;
 }
 
 @end

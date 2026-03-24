@@ -30,14 +30,23 @@
 static NSData * _CalculateHash(NSData * data, const EVP_MD * md, size_t out_size)
 {
     NSMutableData * hash = [NSMutableData dataWithLength:out_size];
-    EVP_MD_CTX * ctx = EVP_MD_CTX_new();
+    EVP_MD_CTX * ctx;
     BOOL success = NO;
     do {
-        EVP_DigestInit(ctx, md);
-        if (data) {
-            EVP_DigestUpdate(ctx, data.bytes, data.length);
+        if (!(ctx = EVP_MD_CTX_new())) {
+            break;
         }
-        EVP_DigestFinal(ctx, hash.mutableBytes, NULL);
+        if (1 != EVP_DigestInit(ctx, md)) {
+            break;
+        }
+        if (data) {
+            if (1 != EVP_DigestUpdate(ctx, data.bytes, data.length)) {
+                break;
+            }
+        }
+        if (1 != EVP_DigestFinal(ctx, hash.mutableBytes, NULL)) {
+            break;
+        }
         success = YES;
     } while (false);
     if (ctx) EVP_MD_CTX_free(ctx);

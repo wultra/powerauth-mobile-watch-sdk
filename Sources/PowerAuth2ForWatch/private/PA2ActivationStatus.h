@@ -36,6 +36,7 @@
 + (nonnull PA2ActivationStatus*) fromPacket:(nullable PA2WCSessionPacket_ActivationStatus*)status;
 
 - (BOOL) isEqual:(nullable id)object;
+- (NSUInteger) hash;
 
 @end
 

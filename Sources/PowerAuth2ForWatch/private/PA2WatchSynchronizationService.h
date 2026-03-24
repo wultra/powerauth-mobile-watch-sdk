@@ -41,7 +41,7 @@
 - (nullable NSString*) activationIdForSessionInstanceId:(nonnull NSString*)sessionInstanceId;
 
 /**
- Returns activation status objdct for given session instance identifier. In fact, if the non-nil value is
+ Returns activation status object for given session instance identifier. In fact, if the non-nil value is
  returned, then the requested session is still valid.
  */
 - (nullable PA2ActivationStatus*) activationStatusForSessionInstanceId:(nonnull NSString*)sessionInstanceId;

@@ -30,8 +30,6 @@
 @implementation PowerAuthToken
 {
     PA2PrivateTokenData * _tokenData;
-    NSString * _algorithm;
-    NSString * _version;
     __weak id<PowerAuthPrivateTokenStore> _tokenStore;
 }
 
@@ -76,6 +74,13 @@
 #endif
         return nil;
     }
+    NSString * version = _tokenStore.protocolVersion;
+    NSString * algorithm = _tokenStore.algorithm;
+    if (!version || !algorithm) {
+        PowerAuthLog(@"PowerAuthToken: Protocol version or algorithm is unknown.");
+        return nil;
+    }
+
     NSData * tokenSecret = nil;
     NSString * tokenIdentifier = nil;
     
@@ -86,7 +91,7 @@
     NSNumber * currentTimeMs = @((int64_t)([[NSDate date] timeIntervalSince1970] * 1000));
     NSString * currentTimeString = [currentTimeMs stringValue];
     NSData * currentTimeData = [currentTimeString dataUsingEncoding:NSASCIIStringEncoding];
-    NSData * versionData = [_version dataUsingEncoding:NSASCIIStringEncoding];
+    NSData * versionData = [version dataUsingEncoding:NSASCIIStringEncoding];
     NSData * nonce = [PA2CoreCryptoUtils randomBytes:16];
     if (!nonce) {
         PowerAuthLog(@"PowerAuthToken: Failed to generate nonce.");
@@ -100,7 +105,7 @@
     
     // Calculate digest...
     NSData * digest;
-    if ([@"LEGACY_P256" isEqualToString:_algorithm]) {
+    if ([@"LEGACY_P256" isEqualToString:algorithm]) {
         // V3
         digest = [PA2CoreCryptoUtils hmacSha256:data
                                             key:tokenSecret];
