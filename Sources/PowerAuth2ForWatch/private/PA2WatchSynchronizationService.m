@@ -82,14 +82,19 @@
     if (sessionInstanceId.length > 0) {
         BOOL removeAssociatedTokens = NO;
         NSData * currentStatusData = [_statusKeychain dataForKey:sessionInstanceId status:NULL];
-        PA2ActivationStatus * currentStatus = currentStatusData ? [PA2ActivationStatus fromData:currentStatusData] : nil;
-        if (activationStatus) {
+        PA2ActivationStatus * currentStatus = [PA2ActivationStatus fromData:currentStatusData];
+        if (activationStatus.activationId.length > 0) {
             PA2ActivationStatus * newStatus = [PA2ActivationStatus fromPacket:activationStatus];
             if (currentStatus) {
-                if (![currentStatus.activationId isEqualToString:newStatus.activationId]) {
+                if (![currentStatus isEqual:newStatus]) {
+                    // Status object changed. We have to store the new status and take a special care if activation ID has been changed.
                     [_statusKeychain updateValue:[newStatus toData] forKey:sessionInstanceId];
-                    PowerAuthLog(@"PA2WatchSynchronizationService: Session with instanceId '%@' is now activated (with different activation ID).", sessionInstanceId);
-                    removeAssociatedTokens = YES;
+                    removeAssociatedTokens = ![currentStatus.activationId isEqualToString:newStatus.activationId];
+                    if (removeAssociatedTokens) {
+                        PowerAuthLog(@"PA2WatchSynchronizationService: Session with instanceId '%@' is now activated (with different activation ID).", sessionInstanceId);
+                    } else {
+                        PowerAuthLog(@"PA2WatchSynchronizationService: Session with instanceId '%@' updated.", sessionInstanceId);
+                    }
                 }
             } else {
                 [_statusKeychain addValue:[newStatus toData] forKey:sessionInstanceId];

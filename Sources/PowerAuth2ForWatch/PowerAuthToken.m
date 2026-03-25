@@ -128,7 +128,7 @@
                         @", token_digest=\"%@\""
                         @", nonce=\"%@\""
                         @", timestamp=\"%@\"",
-                        _version, tokenIdentifier, digestBase64, nonceBase64, currentTimeString];
+                        version, tokenIdentifier, digestBase64, nonceBase64, currentTimeString];
     return [PowerAuthAuthorizationHttpHeader tokenHeaderWithValue:value];
 }
 
@@ -164,8 +164,6 @@
     self = [super init];
     if (self) {
         _tokenStore = store;
-        _algorithm = store.algorithm;
-        _version = store.protocolVersion;
         _tokenData = data;
     }
     return self;

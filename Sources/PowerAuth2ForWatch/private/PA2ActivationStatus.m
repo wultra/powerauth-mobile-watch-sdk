@@ -109,7 +109,7 @@ static NSString * const FALLBACK_PROTOCOL   = @"3.3";
             }
         }
     }
-    return [[PA2ActivationStatus alloc] init];
+    return nil;
     
 }
 
@@ -121,7 +121,7 @@ static NSString * const FALLBACK_PROTOCOL   = @"3.3";
                                                       algorithm:status.algorithm
                                                        protocol:status.protocolVersion];
     }
-    return [[PA2ActivationStatus alloc] init];
+    return nil;
 }
 
 static BOOL _StringCompare(NSString * s1, NSString * s2)

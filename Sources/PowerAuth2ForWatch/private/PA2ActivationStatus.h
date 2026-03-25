@@ -27,13 +27,15 @@
 /// Serialize object to data.
 - (nonnull NSData*) toData;
 
-/// Deserialize object from data.
+/// Deserialize object from previously serialized data.
 /// - Parameter data: Previously serialized data.
-+ (nonnull PA2ActivationStatus*) fromData:(nullable NSData*)data;
+/// - Returns: Status object created from the received packet, or `nil` if input data is `nil` or if deserialized data is invalid.
++ (nullable PA2ActivationStatus*) fromData:(nullable NSData*)data;
 
-/// Create object from received status packet. If `nil` is provided, then creates an empty object.
+/// Create object from received status packet.
 /// - Parameter status: Received status packet.
-+ (nonnull PA2ActivationStatus*) fromPacket:(nullable PA2WCSessionPacket_ActivationStatus*)status;
+/// - Returns: Status object created from the received packet, or `nil` if received packet is `nil`.
++ (nullable PA2ActivationStatus*) fromPacket:(nullable PA2WCSessionPacket_ActivationStatus*)status;
 
 - (BOOL) isEqual:(nullable id)object;
 - (NSUInteger) hash;

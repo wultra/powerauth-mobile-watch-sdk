@@ -30,7 +30,7 @@
 static NSData * _CalculateHash(NSData * data, const EVP_MD * md, size_t out_size)
 {
     NSMutableData * hash = [NSMutableData dataWithLength:out_size];
-    EVP_MD_CTX * ctx;
+    EVP_MD_CTX * ctx = NULL;
     BOOL success = NO;
     do {
         if (!(ctx = EVP_MD_CTX_new())) {
@@ -59,7 +59,7 @@ static NSData * _CalculateMac(NSData * data, NSData * key, NSData * custom,
 {
     BOOL success = NO;
     NSMutableData * result = [NSMutableData dataWithLength:out_size];
-    EVP_MAC * mac;
+    EVP_MAC * mac = NULL;
     EVP_MAC_CTX * ctx = NULL;
     OSSL_PARAM_BLD * builder = NULL;
     OSSL_PARAM * params = NULL;

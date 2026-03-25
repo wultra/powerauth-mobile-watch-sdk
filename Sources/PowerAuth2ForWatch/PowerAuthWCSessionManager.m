@@ -135,6 +135,9 @@ static PA2WCSessionPacket * _DeserializePacket(NSData * data, Class payloadClass
         return nil;
     }
     
+    // We can process the response after this point.
+    *unknownData = NO;
+    
     // Compare versions
     if (dataBytes[_MagicSize] != _HeaderVersion) {
         // Reply with a special packet with identical version as we received. This guarantees that another side is able to process this error.
@@ -144,28 +147,30 @@ static PA2WCSessionPacket * _DeserializePacket(NSData * data, Class payloadClass
         return packet;
     }
     
-    // ... and if the rest of data contains valid JSON
-    *unknownData = NO;
+    // ... the rest of data contains valid JSON
     NSData * JSONData = [data subdataWithRange:NSMakeRange(_HeaderSize, data.length - _HeaderSize)];
     NSDictionary * JSON = PA2ObjectAs([NSJSONSerialization JSONObjectWithData:JSONData options:0 error:NULL], NSDictionary);
-    if (!JSON) {
-        return nil;
-    }
-    PA2WCSessionPacket * packet = [[PA2WCSessionPacket alloc] initWithDictionary:JSON];
-    if (packet && payloadClass != Nil && !packet.error) {
-        // Process payload only when class is known and there's no error in the packet.
-        if ([payloadClass conformsToProtocol:@protocol(PA2WCSessionPacketData)]) {
-            id<PA2WCSessionPacketData> payload = [[payloadClass alloc] initWithDictionary:JSON];
-            if ([payload validatePacketData]) {
-                packet.payload = payload;
+    PA2WCSessionPacket * packet;
+    if (JSON) {
+        packet = [[PA2WCSessionPacket alloc] initWithDictionary:JSON];
+        if (packet && payloadClass != Nil && !packet.error) {
+            // Process payload only when class is known and there's no error in the packet.
+            if ([payloadClass conformsToProtocol:@protocol(PA2WCSessionPacketData)]) {
+                id<PA2WCSessionPacketData> payload = [[payloadClass alloc] initWithDictionary:JSON];
+                if ([payload validatePacketData]) {
+                    packet.payload = payload;
+                } else {
+                    NSString * message = [NSString stringWithFormat:@"PA2WCSessionManager: Invalid payload. %@ class is expected.", NSStringFromClass(payloadClass)];
+                    packet = [PA2WCSessionPacket packetWithError:PA2MakeError(PowerAuthErrorCode_WatchConnectivity, message)];
+                }
             } else {
-                NSString * message = [NSString stringWithFormat:@"PA2WCSessionManager: Invalid payload. %@ class is expected.", NSStringFromClass(payloadClass)];
+                NSString * message = @"PA2WCSessionManager: Invalid class provided for payload response.";
                 packet = [PA2WCSessionPacket packetWithError:PA2MakeError(PowerAuthErrorCode_WatchConnectivity, message)];
             }
-        } else {
-            NSString * message = @"PA2WCSessionManager: Invalid class provided for payload response.";
-            packet = [PA2WCSessionPacket packetWithError:PA2MakeError(PowerAuthErrorCode_WatchConnectivity, message)];
         }
+    } else {
+        NSString * message = @"PA2WCSessionManager: Invalid payload. Failed to deserialize JSON.";
+        packet = [PA2WCSessionPacket packetWithError:PA2MakeError(PowerAuthErrorCode_WatchConnectivity, message)];
     }
     return packet;
 }

@@ -31,12 +31,12 @@
 /**
  Contains current PowerAuth algorithm name.
  */
-@property (nonatomic, nonnull, readonly, strong) NSString * algorithm;
+@property (nonatomic, nullable, readonly, strong) NSString * algorithm;
 
 /**
  Contains current PowerAuth protocol version (3.3, 4.0, etc.)
  */
-@property (nonatomic, nonnull, readonly, strong) NSString * protocolVersion;
+@property (nonatomic, nullable, readonly, strong) NSString * protocolVersion;
 
 /**
  Determine whether token can be still used for 
