@@ -24,14 +24,8 @@
 #import "PA2PrivateTokenInterfaces.h"
 #import "PA2PrivateTokenData.h"
 
-#if PA2_HAS_CORE_MODULE
-    // Regular SDK
-    @import PowerAuthCore;
-#else
-    // Extensions/watchOS SDK
-    #import "PA2CoreCryptoUtils.h"
-    #define PowerAuthCoreCryptoUtils PA2CoreCryptoUtils
-#endif
+// Extensions/watchOS SDK
+#import "PA2CoreCryptoUtils.h"
 
 @implementation PowerAuthToken
 {
@@ -70,9 +64,6 @@
 
 - (PowerAuthAuthorizationHttpHeader*) generateHeader
 {
-    NSData * tokenSecret = nil;
-    NSString * tokenIdentifier = nil;
-    
     if (!self.canGenerateHeader) {
 #if defined(DEBUG)
         if (!self.isValid) {
@@ -83,6 +74,15 @@
 #endif
         return nil;
     }
+    NSString * version = _tokenStore.protocolVersion;
+    NSString * algorithm = _tokenStore.algorithm;
+    if (!version || !algorithm) {
+        PowerAuthLog(@"PowerAuthToken: Protocol version or algorithm is unknown.");
+        return nil;
+    }
+
+    NSData * tokenSecret = nil;
+    NSString * tokenIdentifier = nil;
     
     tokenSecret = _tokenData.secret;
     tokenIdentifier = _tokenData.identifier;
@@ -91,30 +91,44 @@
     NSNumber * currentTimeMs = @((int64_t)([[NSDate date] timeIntervalSince1970] * 1000));
     NSString * currentTimeString = [currentTimeMs stringValue];
     NSData * currentTimeData = [currentTimeString dataUsingEncoding:NSASCIIStringEncoding];
-    NSData * nonce = [PowerAuthCoreCryptoUtils randomBytes:16];
-    if (nonce.length != 16) {
-        PowerAuthLog(@"PowerAuthToken: Random generator did not generate enough bytes.");
+    NSData * versionData = [version dataUsingEncoding:NSASCIIStringEncoding];
+    NSData * nonce = [PA2CoreCryptoUtils randomBytes:16];
+    if (!nonce) {
+        PowerAuthLog(@"PowerAuthToken: Failed to generate nonce.");
         return nil;
     }
     NSMutableData * data = [nonce mutableCopy];
     [data appendBytes:"&" length:1];
-    [data appendData: currentTimeData];
+    [data appendData:currentTimeData];
+    [data appendBytes:"&" length:1];
+    [data appendData:versionData];
+    
     // Calculate digest...
-    NSData * digest = [PowerAuthCoreCryptoUtils hmacSha256:data key:tokenSecret];
-    NSString * digestBase64 = [digest base64EncodedStringWithOptions:0];
-    NSString * nonceBase64 = [nonce base64EncodedStringWithOptions:0];
-    // Final check...
-    if (digest.length == 0 || !digestBase64 || !nonceBase64 || !currentTimeString) {
+    NSData * digest;
+    if ([@"LEGACY_P256" isEqualToString:algorithm]) {
+        // V3
+        digest = [PA2CoreCryptoUtils hmacSha256:data
+                                            key:tokenSecret];
+    } else {
+        // V4
+        digest = [PA2CoreCryptoUtils kmac256:data
+                                         key:tokenSecret
+                                      custom:[@"PA4DIGEST" dataUsingEncoding:NSASCIIStringEncoding]
+                                        size:32];
+    }
+    if (!digest) {
         PowerAuthLog(@"PowerAuthToken: Digest calculation did fail.");
         return nil;
     }
+    NSString * digestBase64 = [digest base64EncodedStringWithOptions:0];
+    NSString * nonceBase64 = [nonce base64EncodedStringWithOptions:0];
     NSString * value = [NSString stringWithFormat:
-                        @"PowerAuth version=\"3.1\""
+                        @"PowerAuth version=\"%@\""
                         @", token_id=\"%@\""
                         @", token_digest=\"%@\""
                         @", nonce=\"%@\""
                         @", timestamp=\"%@\"",
-                        tokenIdentifier, digestBase64, nonceBase64, currentTimeString];
+                        version, tokenIdentifier, digestBase64, nonceBase64, currentTimeString];
     return [PowerAuthAuthorizationHttpHeader tokenHeaderWithValue:value];
 }
 
@@ -133,7 +147,8 @@
 
 - (id) copyWithZone:(NSZone *)zone
 {
-    return [[PowerAuthToken alloc] initWithStore:_tokenStore data:[_tokenData copy]];
+    return [[PowerAuthToken alloc] initWithStore:_tokenStore
+                                            data:[_tokenData copy]];
 }
 
 #pragma mark - Private methods

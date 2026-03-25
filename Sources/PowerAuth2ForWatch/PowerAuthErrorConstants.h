@@ -46,6 +46,9 @@ PA2_EXTERN_C NSString * __nonnull const PowerAuthErrorInfoKey_ResponseData;
  */
 PA2_EXTERN_C NSString * __nonnull const PowerAuthErrorInfoKey_ExternalPendingOperation;
 
+
+// TODO: redesign error codes
+
 /**
  Error codes returned for PowerAuthErrorDomain errors
  */
@@ -143,6 +146,26 @@ typedef NS_ENUM(NSInteger, PowerAuthErrorCode) {
      User canceled the biometric authentication dialog with a fallback button.
      */
     PowerAuthErrorCode_BiometryFallback             = 19,
+    /**
+     Failed to synchronize time with the server.
+     */
+    PowerAuthErrorCode_TimeSynchronization          = 20,
+    /**
+     Digital or JWS signature is not valid.
+     */
+    PowerAuthErrorCode_WrongSignature               = 21,
+    /**
+     Upgrade the PowerAuth Mobile SDK in your application. This error may occur if the local activation data was created
+     with a newer version of the SDK than the one currently used in your application.
+
+     This situation can happen if you downgraded your application during testing, or if you are using the activation
+     data sharing feature and another application upgraded the shared activation data to a newer format.
+     */
+    PowerAuthErrorCode_UpgradeSDK                   = 22,
+    /**
+     Other, unspecified error.
+     */
+    PowerAuthErrorCode_Other                        = 23,
 };
 
 @interface NSError (PowerAuthErrorCode)

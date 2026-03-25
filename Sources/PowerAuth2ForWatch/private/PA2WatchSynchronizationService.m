@@ -19,6 +19,7 @@
 #import "PA2WCSessionPacket_ActivationStatus.h"
 #import "PA2WCSessionPacket_TokenData.h"
 #import "PA2WCSessionPacket_Success.h"
+#import "PA2ActivationStatus.h"
 
 #import "PA2PrivateMacros.h"
 #import "PA2PrivateTokenData.h"
@@ -60,37 +61,48 @@
 
 #pragma mark - Public methods
 
-- (NSString*) activationIdForSessionInstanceId:(nonnull NSString*)sessionInstanceId
+- (NSString*) activationIdForSessionInstanceId:(NSString*)sessionInstanceId
+{
+    return [self activationStatusForSessionInstanceId:sessionInstanceId].activationId;
+}
+
+- (PA2ActivationStatus*) activationStatusForSessionInstanceId:(NSString*)sessionInstanceId
 {
     if (sessionInstanceId.length > 0) {
         NSData * statusData = [_statusKeychain dataForKey:sessionInstanceId status:NULL];
-        if (statusData.length > 0) {
-            return [[NSString alloc] initWithData:statusData encoding:NSUTF8StringEncoding];
+        if (statusData) {
+            return [PA2ActivationStatus fromData:statusData];
         }
     }
     return nil;
 }
 
-- (void) updateActivationId:(nullable NSString*)activationId forSessionInstanceId:(nonnull NSString*)sessionInstanceId
+- (void) updateActivationStatus:(nullable PA2WCSessionPacket_ActivationStatus*)activationStatus forSessionInstanceId:(nonnull NSString*)sessionInstanceId
 {
     if (sessionInstanceId.length > 0) {
         BOOL removeAssociatedTokens = NO;
-        NSData * currentData = [_statusKeychain dataForKey:sessionInstanceId status:NULL];
-        if (activationId) {
-            NSData * activationIdData = [activationId dataUsingEncoding:NSUTF8StringEncoding];
-            if (currentData) {
-                if (![currentData isEqualToData:activationIdData]) {
-                    [_statusKeychain updateValue:activationIdData forKey:sessionInstanceId];
-                    PowerAuthLog(@"PA2WatchSynchronizationService: Session with instanceId '%@' is now activated (with different activation ID).", sessionInstanceId);
-                    removeAssociatedTokens = YES;
+        NSData * currentStatusData = [_statusKeychain dataForKey:sessionInstanceId status:NULL];
+        PA2ActivationStatus * currentStatus = [PA2ActivationStatus fromData:currentStatusData];
+        if (activationStatus.activationId.length > 0) {
+            PA2ActivationStatus * newStatus = [PA2ActivationStatus fromPacket:activationStatus];
+            if (currentStatus) {
+                if (![currentStatus isEqual:newStatus]) {
+                    // Status object changed. We have to store the new status and take a special care if activation ID has been changed.
+                    [_statusKeychain updateValue:[newStatus toData] forKey:sessionInstanceId];
+                    removeAssociatedTokens = ![currentStatus.activationId isEqualToString:newStatus.activationId];
+                    if (removeAssociatedTokens) {
+                        PowerAuthLog(@"PA2WatchSynchronizationService: Session with instanceId '%@' is now activated (with different activation ID).", sessionInstanceId);
+                    } else {
+                        PowerAuthLog(@"PA2WatchSynchronizationService: Session with instanceId '%@' updated.", sessionInstanceId);
+                    }
                 }
             } else {
-                [_statusKeychain addValue:activationIdData forKey:sessionInstanceId];
+                [_statusKeychain addValue:[newStatus toData] forKey:sessionInstanceId];
                 PowerAuthLog(@"PA2WatchSynchronizationService: Session with instanceId '%@' is now activated.", sessionInstanceId);
             }
         } else {
             // Removing activation status
-            if (currentData) {
+            if (currentStatus) {
                 [_statusKeychain deleteDataForKey:sessionInstanceId];
                 PowerAuthLog(@"PA2WatchSynchronizationService: Session with instanceId '%@' is no longer activated.", sessionInstanceId);
             }
@@ -162,7 +174,7 @@
         NSString * command = status.command;
         if ([command isEqualToString:PA2WCSessionPacket_CMD_SESSION_PUT]) {
             // Update session status
-            [self updateActivationId:status.activationId forSessionInstanceId:instanceId];
+            [self updateActivationStatus:status forSessionInstanceId:instanceId];
             //
         } else {
             //

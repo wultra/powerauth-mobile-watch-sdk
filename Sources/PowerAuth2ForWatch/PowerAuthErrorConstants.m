@@ -43,6 +43,7 @@ NSString * PA2MakeDefaultErrorDescription(NSInteger errorCode, NSString * messag
         _CODE_DESC(PowerAuthErrorCode_ActivationPending, @"Pending activation")
         _CODE_DESC(PowerAuthErrorCode_BiometryNotAvailable, @"Biometry is not supported or is unavailable")
         _CODE_DESC(PowerAuthErrorCode_BiometryCancel, @"User did cancel biometry authentication dialog")
+        _CODE_DESC(PowerAuthErrorCode_BiometryFallback, @"User did press fallback at biometry authentication dialog")
         _CODE_DESC(PowerAuthErrorCode_BiometryFailed, @"Biometry authentication failed")
         _CODE_DESC(PowerAuthErrorCode_OperationCancelled, @"Operation was cancelled by SDK")
         _CODE_DESC(PowerAuthErrorCode_Encryption, @"General encryption failure")
@@ -50,8 +51,12 @@ NSString * PA2MakeDefaultErrorDescription(NSInteger errorCode, NSString * messag
         _CODE_DESC(PowerAuthErrorCode_InvalidToken, @"Invalid or unknown token")
         _CODE_DESC(PowerAuthErrorCode_WatchConnectivity, @"Watch connectivity error")
         _CODE_DESC(PowerAuthErrorCode_ProtocolUpgrade, @"Protocol upgrade error")
-        _CODE_DESC(PowerAuthErrorCode_PendingProtocolUpgrade, @"Pending protocol ugprade, try later")
+        _CODE_DESC(PowerAuthErrorCode_PendingProtocolUpgrade, @"Pending protocol upgrade, try later")
         _CODE_DESC(PowerAuthErrorCode_ExternalPendingOperation, @"Other application does critical operation")
+        _CODE_DESC(PowerAuthErrorCode_TimeSynchronization, @"Failed to synchronize time with the server")
+        _CODE_DESC(PowerAuthErrorCode_WrongSignature, @"Wrong digital signature")
+        _CODE_DESC(PowerAuthErrorCode_UpgradeSDK, @"PowerAuth Mobile SDK update is required")
+        _CODE_DESC(PowerAuthErrorCode_Other, @"Unspecified error")
         default:
             return [NSString stringWithFormat:@"Unknown error %@", @(errorCode)];
     }

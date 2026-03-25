@@ -20,24 +20,116 @@
 #import "PA2CoreCryptoUtils.h"
 #import <PowerAuth2ForWatch/PowerAuthLog.h>
 
-#include <CommonCrypto/CommonCrypto.h>
-#include <CommonCrypto/CommonRandom.h>
+#include <openssl/evp.h>
+#include <openssl/param_build.h>
+#include <openssl/core_names.h>
+#include <openssl/rand.h>
 
 @implementation PA2CoreCryptoUtils
 
-+ (nonnull NSData*) hashSha256:(nonnull NSData*)data
+static NSData * _CalculateHash(NSData * data, const EVP_MD * md, size_t out_size)
 {
-    unsigned char md[CC_SHA256_DIGEST_LENGTH];
-    CC_SHA256(data.bytes, (CC_LONG)data.length, md);
-    return [NSData dataWithBytes:md length:sizeof(md)];
+    NSMutableData * hash = [NSMutableData dataWithLength:out_size];
+    EVP_MD_CTX * ctx = NULL;
+    BOOL success = NO;
+    do {
+        if (!(ctx = EVP_MD_CTX_new())) {
+            break;
+        }
+        if (1 != EVP_DigestInit(ctx, md)) {
+            break;
+        }
+        if (data) {
+            if (1 != EVP_DigestUpdate(ctx, data.bytes, data.length)) {
+                break;
+            }
+        }
+        if (1 != EVP_DigestFinal(ctx, hash.mutableBytes, NULL)) {
+            break;
+        }
+        success = YES;
+    } while (false);
+    if (ctx) EVP_MD_CTX_free(ctx);
+    return success ? hash : nil;
 }
 
-+ (nonnull NSData*) hmacSha256:(nonnull NSData*)data
-                           key:(nonnull NSData*)key
+static NSData * _CalculateMac(NSData * data, NSData * key, NSData * custom,
+                              const char * alg, const char * md,
+                              size_t out_size)
 {
-    char mac[CC_SHA256_DIGEST_LENGTH];
-    CCHmac(kCCHmacAlgSHA256, key.bytes, key.length, data.bytes, data.length, mac);
-    return [NSData dataWithBytes:mac length:sizeof(mac)];
+    BOOL success = NO;
+    NSMutableData * result = [NSMutableData dataWithLength:out_size];
+    EVP_MAC * mac = NULL;
+    EVP_MAC_CTX * ctx = NULL;
+    OSSL_PARAM_BLD * builder = NULL;
+    OSSL_PARAM * params = NULL;
+    do {
+        // Fetch MAC & prepare CTX object
+        if (!(mac = EVP_MAC_fetch(NULL, alg, NULL))) {
+            break;
+        }
+        if (!(ctx = EVP_MAC_CTX_new(mac))) {
+            break;
+        }
+        // Parametrize MAC with params builder
+        if (!(builder = OSSL_PARAM_BLD_new())) {
+            break;
+        }
+        if (md) {
+            OSSL_PARAM_BLD_push_utf8_string(builder, OSSL_MAC_PARAM_DIGEST,
+                                            md, strlen(md));
+        }
+        if (custom) {
+            OSSL_PARAM_BLD_push_octet_string(builder, OSSL_MAC_PARAM_CUSTOM,
+                                             custom.bytes, custom.length);
+        }
+        OSSL_PARAM_BLD_push_size_t(builder, OSSL_MAC_PARAM_SIZE, out_size);
+        // Initialize params
+        if (!(params = OSSL_PARAM_BLD_to_param(builder))) {
+            break;
+        }
+        // Initialize MAC CTX
+        if (!EVP_MAC_init(ctx, key.bytes, key.length, params)) {
+            break;
+        }
+        // Update MAC
+        if (!EVP_MAC_update(ctx, data.bytes, data.length)) {
+            break;
+        }
+        // Finalize MAC calculation
+        size_t mac_length;
+        if (!EVP_MAC_final(ctx, result.mutableBytes, &mac_length, result.length)) {
+            break;
+        }
+        if (mac_length != out_size) {
+            break;
+        }
+        success = YES;
+    } while (false);
+    if (params) OSSL_PARAM_free(params);
+    if (builder) OSSL_PARAM_BLD_free(builder);
+    if (ctx) EVP_MAC_CTX_free(ctx);
+    if (mac) EVP_MAC_free(mac);
+    return success ? result : nil;
+}
+
++ (nullable NSData*) hashSha256:(nullable NSData*)data
+{
+    return _CalculateHash(data, EVP_sha256(), 32);
+}
+
++ (nullable NSData*) hmacSha256:(nullable NSData*)data
+                            key:(nonnull NSData*)key
+{
+    return _CalculateMac(data, key, NULL, "HMAC", "SHA-256", 32);
+}
+
++ (nullable NSData*) kmac256:(nullable NSData*)data
+                         key:(nonnull NSData*)key
+                      custom:(nonnull NSData*)custom
+                        size:(NSUInteger)size
+{
+    return _CalculateMac(data, key, custom, "KMAC-256", NULL, size);
 }
 
 + (nullable NSData*) randomBytes:(NSUInteger)count
@@ -45,21 +137,23 @@
     if (count == 0) {
         return nil;
     }
-    NSMutableData * zeros = [NSMutableData dataWithLength:count];
-    NSMutableData * data  = [NSMutableData dataWithLength:count];
-    void * dest_ptr = data.mutableBytes;
-    size_t dest_len = data.length;
-    NSUInteger attempts = 16;
-    while (attempts-- != 0) {
-        if (kCCSuccess != CCRandomGenerateBytes(dest_ptr, dest_len)) {
-            arc4random_buf(dest_ptr, dest_len);
+    NSMutableData * data = [NSMutableData dataWithLength:count];
+    size_t attempts = 16;
+    while (1) {
+        if (1 == RAND_bytes(data.mutableBytes, (int)data.length)) {
+            break;
         }
-        if (![data isEqualToData:zeros]) {
-            return data;
+        if (--attempts == 0) {
+            data = nil;
+            break;
         }
     }
-    PowerAuthLog(@"PA2CoreCryptoUtils: Failed to generat %@ random bytes.", @(count));
-    return nil;
+    return data;
+}
+
++ (nullable NSData*) hashSha3_256:(nullable NSData*)data
+{
+    return _CalculateHash(data, EVP_sha3_256(), 32);
 }
 
 @end

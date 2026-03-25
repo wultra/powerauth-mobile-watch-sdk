@@ -15,6 +15,9 @@
  */
 
 #import "PA2WCSessionDataHandler.h"
+#import "PA2ActivationStatus.h"
+
+@class PA2WCSessionPacket_ActivationStatus;
 
 /**
  On watchOS, the PA2WatchSynchronizationService class is responsible for processing
@@ -38,8 +41,14 @@
 - (nullable NSString*) activationIdForSessionInstanceId:(nonnull NSString*)sessionInstanceId;
 
 /**
+ Returns activation status object for given session instance identifier. In fact, if the non-nil value is
+ returned, then the requested session is still valid.
+ */
+- (nullable PA2ActivationStatus*) activationStatusForSessionInstanceId:(nonnull NSString*)sessionInstanceId;
+
+/**
  Removes or adds activation for given session instance identifier, depending on nullability of activationId.
  */
-- (void) updateActivationId:(nullable NSString*)activationId forSessionInstanceId:(nonnull NSString*)sessionInstanceId;
+- (void) updateActivationStatus:(nullable PA2WCSessionPacket_ActivationStatus*)activationStatus forSessionInstanceId:(nonnull NSString*)sessionInstanceId;
 
 @end
