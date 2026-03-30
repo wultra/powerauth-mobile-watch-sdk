@@ -22,6 +22,7 @@
 /// - Parameters:
 ///   - key: HTTP header name.
 ///   - value: HTTP header value.
-- (instancetype)initWithKey:(NSString*)key value:(NSString*)value;
+- (instancetype)initWithKey:(nonnull NSString*)key
+                      value:(nonnull NSString*)value;
 
 @end

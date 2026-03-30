@@ -174,8 +174,16 @@
 }
 
 - (nullable PowerAuthHttpHeader*) calculateTokenHeader:(PA2PrivateTokenData *)tokenData
-                                                 error:(NSError * _Nullable __autoreleasing *)error
+                                                 error:(NSError *_Nullable *_Nullable)error
 {
+    if (!_statusProvider.hasValidActivation) {
+        PA2SetError(error, PowerAuthErrorCode_MissingActivation, @"Activation is no longer valid");
+        return nil;
+    }
+    if (![_statusProvider.activationIdentifier isEqualToString:tokenData.activationIdentifier]) {
+        PA2SetError(error, PowerAuthErrorCode_InvalidToken, @"Activation for this token is no longer valid");
+        return nil;
+    }
     if (!tokenData.hasValidData) {
         PA2SetError(error, PowerAuthErrorCode_InvalidToken, @"Token contains invalid data.");
         return nil;

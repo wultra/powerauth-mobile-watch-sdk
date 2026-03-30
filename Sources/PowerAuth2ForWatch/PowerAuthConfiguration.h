@@ -23,7 +23,7 @@
  */
 @interface PowerAuthConfiguration : NSObject<NSCopying>
 
-/// No longer available. Use `init(instanceId:baseEndpointUrl:configuration:)` instead.
+/// No longer available. Use `init(instanceId:)` instead.
 - (nonnull instancetype) init NS_UNAVAILABLE;
 
 /// Initialize object with all required parameters.

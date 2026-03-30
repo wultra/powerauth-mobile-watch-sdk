@@ -48,15 +48,14 @@
     return result;
 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
 - (id) copyWithZone:(NSZone *)zone
 {
-    PowerAuthConfiguration * c = [[self.class allocWithZone:zone] init];
-    if (c) {
-        c->_instanceId = _instanceId;
-        c->_baseEndpointUrl = _baseEndpointUrl;
-        c->_configuration = _configuration;
-    }
-    return c;
+    return [[self.class allocWithZone:zone] initWithInstanceId:_instanceId
+                                               baseEndpointUrl:_baseEndpointUrl
+                                                 configuration:_configuration];
 }
+#pragma clang diagnostic pop
 
 @end
