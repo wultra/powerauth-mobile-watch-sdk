@@ -23,6 +23,8 @@
 #import "PA2PrivateMacros.h"
 #import "PA2CreateTokenTask.h"
 #import "PowerAuthAuthentication+Private.h"
+#import "PowerAuthHttpHeader+Private.h"
+#import "PA2CoreCryptoUtils.h"
 
 #import <PowerAuth2ForWatch/PowerAuthErrorConstants.h>
 #import <PowerAuth2ForWatch/PowerAuthKeychain.h>
@@ -132,16 +134,6 @@
 
 #pragma mark - PowerAuthPrivateTokenStore protocol
 
-- (NSString*) protocolVersion
-{
-    return _statusProvider.powerAuthProtocolVersion;
-}
-
-- (NSString*) algorithm
-{
-    return _statusProvider.powerAuthAlgorithm;
-}
-
 - (BOOL) canGenerateHeaderForToken:(PowerAuthToken *)token
 {
     return [_statusProvider hasValidActivation] && [_statusProvider.activationIdentifier isEqualToString:token.privateTokenData.activationIdentifier];
@@ -179,6 +171,71 @@
         [obj cancel];
     }];
     [_createTokenTasks removeAllObjects];
+}
+
+- (nullable PowerAuthHttpHeader*) calculateTokenHeader:(PA2PrivateTokenData *)tokenData
+                                                 error:(NSError * _Nullable __autoreleasing *)error
+{
+    if (!tokenData.hasValidData) {
+        PA2SetError(error, PowerAuthErrorCode_InvalidToken, @"Token contains invalid data.");
+        return nil;
+    }
+    
+    NSString * version = _statusProvider.powerAuthProtocolVersion;
+    NSString * algorithm = _statusProvider.powerAuthAlgorithm;
+    if (!version || !algorithm) {
+        PA2SetError(error, PowerAuthErrorCode_Other, @"Protocol version or algorithm is unavailable in token calculation");
+        return nil;
+    }
+
+    NSData * tokenSecret = tokenData.secret;
+    NSString * tokenIdentifier = tokenData.identifier;
+
+    // Prepare data for HMAC
+    NSNumber * currentTimeMs = @((int64_t)([[NSDate date] timeIntervalSince1970] * 1000));
+    NSString * currentTimeString = [currentTimeMs stringValue];
+    NSData * currentTimeData = [currentTimeString dataUsingEncoding:NSASCIIStringEncoding];
+    NSData * versionData = [version dataUsingEncoding:NSASCIIStringEncoding];
+    NSData * nonce = [PA2CoreCryptoUtils randomBytes:16];
+    if (!nonce) {
+        PA2SetError(error, PowerAuthErrorCode_Other, @"Failed to generate nonce");
+        return nil;
+    }
+    NSMutableData * data = [nonce mutableCopy];
+    [data appendBytes:"&" length:1];
+    [data appendData:currentTimeData];
+    [data appendBytes:"&" length:1];
+    [data appendData:versionData];
+    
+    // Calculate digest...
+    NSData * digest;
+    if ([@"LEGACY_P256" isEqualToString:algorithm]) {
+        // V3
+        digest = [PA2CoreCryptoUtils hmacSha256:data
+                                            key:tokenSecret];
+    } else {
+        // V4
+        digest = [PA2CoreCryptoUtils kmac256:data
+                                         key:tokenSecret
+                                      custom:[@"PA4DIGEST" dataUsingEncoding:NSASCIIStringEncoding]
+                                        size:32];
+    }
+    if (!digest) {
+        PA2SetError(error, PowerAuthErrorCode_Other, @"Digest calculation failed");
+        return nil;
+    }
+    NSString * digestBase64 = [digest base64EncodedStringWithOptions:0];
+    NSString * nonceBase64 = [nonce base64EncodedStringWithOptions:0];
+    NSString * value = [NSString stringWithFormat:
+                        @"PowerAuth version=\"%@\""
+                        @", token_id=\"%@\""
+                        @", token_digest=\"%@\""
+                        @", nonce=\"%@\""
+                        @", timestamp=\"%@\"",
+                        version, tokenIdentifier, digestBase64, nonceBase64, currentTimeString];
+    return [[PowerAuthHttpHeader alloc] initWithKey:@"X-PowerAuth-Token"
+                                              value:value];
+
 }
 
 #pragma mark - PowerAuthTokenStore protocol
@@ -313,11 +370,6 @@
     }];
 }
 
-
-#if PA2_HAS_CORE_MODULE == 1 || TARGET_OS_WATCH == 1
-//
-// Implementation available for PowerAuth2 & PowerAuth2ForWatch modules
-//
 - (void) removeLocalTokenWithName:(NSString *)name
 {
     [self synchronizedVoid:^(BOOL * setModified){
@@ -328,7 +380,6 @@
     }];
 }
 
-
 - (void) removeAllLocalTokens
 {
     [self synchronizedVoid:^(BOOL *setModified) {
@@ -338,25 +389,6 @@
         *setModified = YES;
     }];
 }
-
-#else
-//
-// Implementation available only for PowerAuth2ForExtensions
-//
-- (void) removeLocalTokenWithName:(NSString *)name
-{
-    // Issue #433: PowerAuth2ForExtensions has no remote provider, so this function is unavailable.
-    PowerAuthLog(@"ERROR: removeLocalToken() is not available for PowerAuth2ForExtensions module");
-}
-
-- (void) removeAllLocalTokens
-{
-    // Issue #433: PowerAuth2ForExtensions has no remote provider, so this function is unavailable.
-    PowerAuthLog(@"ERROR: removeAllLocalTokens() is not available for PowerAuth2ForExtensions module");
-}
-
-#endif // PA2_HAS_CORE_MODULE == 1 || TARGET_OS_WATCH == 1
-
 
 - (BOOL) hasLocalTokenWithName:(nonnull NSString*)name
 {
@@ -372,6 +404,20 @@
     }
     return nil;
 }
+
+- (nullable id<PowerAuthOperationTask>) generateAuthenticationHeaderWithName:(nonnull NSString *)name
+                                                                  completion:(nonnull void (^)(PowerAuthHttpHeader * _Nullable, NSError * _Nullable))completion
+{
+    // TODO: implement time synchronization
+    return [self requestAccessTokenImpl:name authentication:nil completion:^(PowerAuthToken *token, NSError *error) {
+        PowerAuthHttpHeader * header = nil;
+        if (token) {
+            header = [self calculateTokenHeader:token.privateTokenData error:&error];
+        }
+        completion(header, error);
+    }];
+}
+
 
 
 #pragma mark - Keychain

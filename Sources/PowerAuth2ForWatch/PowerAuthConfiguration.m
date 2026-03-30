@@ -14,14 +14,23 @@
  * limitations under the License.
  */
 
-// PA2_SHARED_SOURCE PowerAuth2ForWatch .
-// PA2_SHARED_SOURCE PowerAuth2ForExtensions .
-
 #import <PowerAuth2ForWatch/PowerAuthConfiguration.h>
 
 @implementation PowerAuthConfiguration
 
-- (id) initWithInstanceId:(NSString *)instanceId baseEndpointUrl:(NSString *)baseEndpointUrl configuration:(NSString *)configuration
+- (instancetype) initWithInstanceId:(nonnull NSString*)instanceId
+{
+    self = [super init];
+    if (self) {
+        _instanceId = instanceId;
+    }
+    return self;
+}
+
+// PA2_DEPRECATED(2.0.0)
+- (id) initWithInstanceId:(NSString *)instanceId
+          baseEndpointUrl:(NSString *)baseEndpointUrl
+            configuration:(NSString *)configuration
 {
     self = [super init];
     if (self) {
@@ -36,25 +45,16 @@
 {
     BOOL result = YES;
     result = result && (_instanceId.length > 0);
-    result = result && (_baseEndpointUrl.length > 0);
-    if (_sharingConfiguration) {
-        result = result && [_sharingConfiguration validateConfiguration];
-    }
-    // TODO:...
-    //result = result && [PowerAuthCoreSessionSetup validateConfiguration:_configuration];
     return result;
 }
 
-- (id)copyWithZone:(NSZone *)zone
+- (id) copyWithZone:(NSZone *)zone
 {
     PowerAuthConfiguration * c = [[self.class allocWithZone:zone] init];
     if (c) {
         c->_instanceId = _instanceId;
         c->_baseEndpointUrl = _baseEndpointUrl;
         c->_configuration = _configuration;
-        c->_keychainKey_Biometry = _keychainKey_Biometry;
-        c->_externalEncryptionKey = _externalEncryptionKey;
-        c->_sharingConfiguration = [_sharingConfiguration copy];
     }
     return c;
 }

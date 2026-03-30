@@ -18,7 +18,7 @@
 #import <PowerAuth2ForWatch/PowerAuthToken.h>
 #import <PowerAuth2ForWatch/PowerAuthSessionStatusProvider.h>
 #import <PowerAuth2ForWatch/PowerAuthKeychainConfiguration.h>
-#import <PowerAuth2ForWatch/PowerAuthAuthorizationHttpHeader.h>
+#import <PowerAuth2ForWatch/PowerAuthHttpHeader.h>
 
 @interface PowerAuthWatchSDK : NSObject<PowerAuthSessionStatusProvider>
 

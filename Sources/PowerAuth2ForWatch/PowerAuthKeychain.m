@@ -152,35 +152,10 @@
 
 static BOOL _AddKeychainAuthentication(NSMutableDictionary * query, PowerAuthKeychainAuthentication * auth, OSStatus * status)
 {
-#if PA2_HAS_LACONTEXT == 1
-    LAContext * context = auth.context;
-    if (context) {
-        if (context.interactionNotAllowed) {
-            PowerAuthLog(@"LAContext.interactionNotAllowed should not be set to true");
-            if (status) { *status = errSecInvalidContext; }
-            return NO;
-        }
-        query[(__bridge id)kSecUseAuthenticationContext] = context;
-        return YES;
-    }
-    NSString * prompt = auth.prompt;
-    if (prompt) {
-        // kSecUseOperationPrompt is deprecated, so on iOS11+ use LAContext.
-        LAContext * context = [[LAContext alloc] init];
-        context.localizedReason = prompt;
-        query[(__bridge id)kSecUseAuthenticationContext] = context;
-        return YES;
-    }
-    // Missing prompt and context, report errSecInvalidContext as the most reasonable error code.
-    PowerAuthLog(@"PowerAuthKeychainAuthentication has no prompt or LAContext set.");
-    if (status) { *status = errSecInvalidContext; }
-    return NO;
-#else
     // PowerAuthKeychainAuthentication is not supported on this platform.
     PowerAuthLog(@"PowerAuthKeychainAuthentication is not supported.");
     if (status) { *status = errSecUnimplemented; }
     return NO;
-#endif // PA2_HAS_LACONTEXT
 }
 
 static void _AddUseNoAuthenticationUI(NSMutableDictionary * query)
@@ -263,111 +238,6 @@ static void _AddUseNoAuthenticationUI(NSMutableDictionary * query)
 
 #pragma mark - Biometry support
 
-#if !defined(PA2_EXTENSION_SDK) && defined(PA2_BIOMETRY_SUPPORT)
-//
-// IOS
-//
-
-/**
- Private helper function to convert LABiometryType enum into our PowerAuthBiometricAuthenticationType
- */
-static PowerAuthBiometricAuthenticationType _LABiometryTypeToPAType(LABiometryType bt)
-{
-    if (bt == LABiometryTypeTouchID) {
-        return PowerAuthBiometricAuthenticationType_TouchID;
-    } else if (bt == LABiometryTypeFaceID) {
-        return PowerAuthBiometricAuthenticationType_FaceID;
-    }
-    // Looks like Apple introduced a new biometry type. We should try to continue,
-    // and pretend that TouchID is available. Application's UI will probably display
-    // wrong information, but at least it may work.
-    PowerAuthLog(@"Warning: LAContext.biometryType contains unknown biometryType %@.", @(bt));
-    return PowerAuthBiometricAuthenticationType_TouchID;
-}
-
-
-/**
- Private function returns full information about biometric support on the system. The method internally
- uses `LAContext.canEvaluatePolicy()`.
- */
-static PowerAuthBiometricAuthenticationInfo _getBiometryInfo(void)
-{
-    PowerAuthBiometricAuthenticationInfo info = { PowerAuthBiometricAuthenticationStatus_NotSupported, PowerAuthBiometricAuthenticationType_None };
-    LAContext * context = [[LAContext alloc] init];
-    NSError * error = nil;
-    BOOL canEvaluate = [context canEvaluatePolicy:kLAPolicyDeviceOwnerAuthenticationWithBiometrics error:&error];
-    if (canEvaluate) {
-        // If we can evaluate, then everything is quite simple.
-        info.currentStatus = PowerAuthBiometricAuthenticationStatus_Available;
-        info.biometryType = _LABiometryTypeToPAType(context.biometryType);
-        //
-    } else {
-        // In case of error we cannot evaluate, but the type of biometry can be determined.
-        NSInteger code = [error.domain isEqualToString:LAErrorDomain] ? error.code : 0;
-        LABiometryType bt = context.biometryType;
-        if (bt != LABiometryTypeNone) {
-            info.biometryType = _LABiometryTypeToPAType(bt);
-            if (code == LAErrorBiometryLockout) {
-                info.currentStatus = PowerAuthBiometricAuthenticationStatus_Lockout;
-            } else if (code == LAErrorBiometryNotEnrolled) {
-                info.currentStatus = PowerAuthBiometricAuthenticationStatus_NotEnrolled;
-            } else {
-                // The biometry is available, but returned error is unknown.
-                PowerAuthLog(@"LAContext.canEvaluatePolicy() failed with error: %@", error);
-                info.currentStatus = PowerAuthBiometricAuthenticationStatus_NotAvailable;
-            }
-        }
-    }
-    return info;
-}
-
-/**
- Translates PowerAuthKeychainItemAccess into SecAccessControlCreateFlags depending on access mode.
- */
-static SecAccessControlCreateFlags _getBiometryAccessControlFlags(PowerAuthKeychainItemAccess access)
-{
-    if (access != PowerAuthKeychainItemAccess_None) {
-        switch (access) {
-            case PowerAuthKeychainItemAccess_AnyBiometricSet:
-                return kSecAccessControlBiometryAny;
-            case PowerAuthKeychainItemAccess_AnyBiometricSetOrDevicePasscode:
-                return kSecAccessControlBiometryAny | kSecAccessControlOr | kSecAccessControlDevicePasscode;
-            case PowerAuthKeychainItemAccess_CurrentBiometricSet:
-                return kSecAccessControlBiometryCurrentSet;
-            default:
-                break;
-        }
-    }
-    // If biometry is not supporte or not requested, use the kNilOptions.
-    return kNilOptions;
-}
-
-+ (BOOL) tryLockBiometryAndExecuteBlock:(void (^_Nonnull)(void))block
-{
-    // Initialize mutex
-    static pthread_mutex_t biometricMutex;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        pthread_mutex_init(&biometricMutex, NULL);
-    });
-    
-    // Try to acquire biometric lock.
-    if (pthread_mutex_trylock(&biometricMutex) != 0) {
-        PowerAuthLog(@"WARNING: Cannot execute more than one biometric authentication request at the same time. This request is going to be canceled.");
-        return NO;
-    }
-    // Execute block
-    block();
-    // Unlock mutex and return success.
-    pthread_mutex_unlock(&biometricMutex);
-    return YES;
-}
-
-#else  // !defined(PA2_EXTENSION_SDK)
-//
-// watchOS + IOS App Extensions
-//
-
 /**
  Returns information about biometric support on the system. This is a special implementation
  returning information that biometry is not supported on watchOS & IOS App Extension.
@@ -394,8 +264,6 @@ static SecAccessControlCreateFlags _getBiometryAccessControlFlags(PowerAuthKeych
     return NO;
 }
 
-#endif // !defined(PA2_EXTENSION_SDK) && defined(PA2_BIOMETRY_SUPPORT)
-
 //
 // High level biometry interfaces
 //
@@ -403,7 +271,7 @@ static SecAccessControlCreateFlags _getBiometryAccessControlFlags(PowerAuthKeych
 + (BOOL) canUseBiometricAuthentication
 {
     // The behavior of this property is that it returns YES, only if biometry policy can be evaluated.
-    return _getBiometryInfo().currentStatus == PowerAuthBiometricAuthenticationStatus_Available;
+    return NO;
 }
 
 + (PowerAuthBiometricAuthenticationType) supportedBiometricAuthentication

@@ -14,20 +14,14 @@
  * limitations under the License.
  */
 
-// PA2_SHARED_SOURCE PowerAuth2ForWatch .
-// PA2_SHARED_SOURCE PowerAuth2ForExtensions .
+#import <PowerAuth2ForWatch/PowerAuthHttpHeader.h>
 
-#import "PowerAuthKeychainAuthentication.h"
+@interface PowerAuthHttpHeader (Private)
 
-@implementation PowerAuthKeychainAuthentication
-
-- (instancetype) initWithPrompt:(NSString*)prompt
-{
-    self = [super init];
-    if (self) {
-        _prompt = prompt;
-    }
-    return self;
-}
+/// Private constructor for header object construction.
+/// - Parameters:
+///   - key: HTTP header name.
+///   - value: HTTP header value.
+- (instancetype)initWithKey:(NSString*)key value:(NSString*)value;
 
 @end

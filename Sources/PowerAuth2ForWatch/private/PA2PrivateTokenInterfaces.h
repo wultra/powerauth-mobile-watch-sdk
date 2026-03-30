@@ -29,16 +29,6 @@
 @required
 
 /**
- Contains current PowerAuth algorithm name.
- */
-@property (nonatomic, nullable, readonly, strong) NSString * algorithm;
-
-/**
- Contains current PowerAuth protocol version (3.3, 4.0, etc.)
- */
-@property (nonatomic, nullable, readonly, strong) NSString * protocolVersion;
-
-/**
  Determine whether token can be still used for 
  */
 - (BOOL) canGenerateHeaderForToken:(nonnull PowerAuthToken*)token;
@@ -58,6 +48,13 @@
  Cancel all pending tasks.
  */
 - (void) cancelAllTasks;
+
+/// Calculate token header for given token data.
+/// - Parameters:
+///   - tokenData: Private token data.
+///   - error: Pointer where to store error.
+- (nullable PowerAuthHttpHeader*) calculateTokenHeader:(nonnull PA2PrivateTokenData*)tokenData
+                                                 error:(NSError*_Nullable*_Nullable)error;
 
 @end
 

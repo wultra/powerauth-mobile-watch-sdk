@@ -17,7 +17,7 @@
 // PA2_SHARED_SOURCE PowerAuth2ForWatch .
 // PA2_SHARED_SOURCE PowerAuth2ForExtensions .
 
-#import <PowerAuth2ForWatch/PowerAuthSharingConfiguration.h>
+#import <PowerAuth2ForWatch/PowerAuthMacros.h>
 
 /** Class that represents a PowerAuth2ForExtensions or PowerAuth2ForWatch instance configuration.
  */
@@ -29,11 +29,17 @@
 /// Initialize object with all required parameters.
 /// - Parameters:
 ///   - instanceId: Identifier of the PowerAuthSDK instance, used as a 'key' to store session state in the session state keychain.
+- (nonnull instancetype) initWithInstanceId:(nonnull NSString*)instanceId;
+
+/// Initialize object with all required parameters.
+/// - Parameters:
+///   - instanceId: Identifier of the PowerAuthSDK instance, used as a 'key' to store session state in the session state keychain.
 ///   - baseEndpointUrl: Base URL to the PowerAuth Standard RESTful API (the URL part before "/pa/...").
 ///   - configuration: String with the cryptographic configuration.
 - (nonnull instancetype) initWithInstanceId:(nonnull NSString*)instanceId
                             baseEndpointUrl:(nonnull NSString*)baseEndpointUrl
-                              configuration:(nonnull NSString*)configuration;
+                              configuration:(nonnull NSString*)configuration
+                                    PA2_DEPRECATED(2.0.0);
 
 /** Identifier of the PowerAuthSDK instance, used as a 'key' to store session state in the session state keychain.
  */
@@ -41,24 +47,11 @@
 
 /** Base URL to the PowerAuth Standard RESTful API (the URL part before "/pa/...").
  */
-@property (nonatomic, strong, nonnull, readonly) NSString *baseEndpointUrl;
+@property (nonatomic, strong, nullable, readonly) NSString *baseEndpointUrl PA2_DEPRECATED(2.0.0);
 
 /** String with the cryptographic configuration.
  */
-@property (nonatomic, strong, nonnull, readonly) NSString *configuration;
-
-/** This value specifies 'key' used to store this PowerAuthSDK instance biometry related key in the biometry key keychain.
- */
-@property (nonatomic, strong, nonnull) NSString *keychainKey_Biometry;
-
-/** Encryption key provided by an external context, used to encrypt possession and biometry related factor keys under the hood.
- */
-@property (nonatomic, strong, nullable) NSData  *externalEncryptionKey;
-
-/**
- If set, then this instance of PowerAuthSDK can be shared between multiple vendor applications.
- */
-@property (nonatomic, strong, nullable) PowerAuthSharingConfiguration * sharingConfiguration;
+@property (nonatomic, strong, nullable, readonly) NSString *configuration PA2_DEPRECATED(2.0.0);
 
 /** Validate that the configuration is properly set (all required values were filled in).
  */

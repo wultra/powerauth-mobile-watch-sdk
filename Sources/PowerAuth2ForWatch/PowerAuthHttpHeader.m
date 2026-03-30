@@ -1,5 +1,5 @@
 /**
- * Copyright 2021 Wultra s.r.o.
+ * Copyright 2026 Wultra s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,9 @@
  * limitations under the License.
  */
 
-// PA2_SHARED_SOURCE PowerAuth2ForWatch .
-// PA2_SHARED_SOURCE PowerAuth2ForExtensions .
+#import <PowerAuth2ForWatch/PowerAuthHttpHeader.h>
 
-#import <PowerAuth2ForWatch/PowerAuthAuthorizationHttpHeader.h>
-
-@implementation PowerAuthAuthorizationHttpHeader
+@implementation PowerAuthHttpHeader
 
 - (instancetype)initWithKey:(NSString*)key value:(NSString*)value
 {
@@ -29,16 +26,6 @@
         _value = value;
     }
     return self;
-}
-
-+ (PowerAuthAuthorizationHttpHeader*) authorizationHeaderWithValue:(NSString *)value
-{
-    return !value ? nil : [[self alloc] initWithKey:@"X-PowerAuth-Authorization" value:value];
-}
-
-+ (PowerAuthAuthorizationHttpHeader*) tokenHeaderWithValue:(NSString *)value
-{
-    return !value ? nil : [[self alloc] initWithKey:@"X-PowerAuth-Token" value:value];
 }
 
 @end

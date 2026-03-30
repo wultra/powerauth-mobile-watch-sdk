@@ -1,5 +1,5 @@
-/*
- * Copyright 2022 Wultra s.r.o.
+/**
+ * Copyright 2026 Wultra s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,17 @@
  * limitations under the License.
  */
 
-// PA2_SHARED_SOURCE PowerAuth2ForWatch .
-// PA2_SHARED_SOURCE PowerAuth2ForExtensions .
+#import <PowerAuth2ForWatch/PowerAuthMacros.h>
 
-#import "PowerAuthKeychainAuthentication.h"
+/// Class representing HTTP header generated in PowerAuth mobile SDK.
+@interface PowerAuthHttpHeader : NSObject
 
-@implementation PowerAuthKeychainAuthentication
+/// HTTP header's name
+@property (nonatomic, strong, readonly, nonnull) NSString *key;
 
-- (instancetype) initWithPrompt:(NSString*)prompt
-{
-    self = [super init];
-    if (self) {
-        _prompt = prompt;
-    }
-    return self;
-}
+/// HTTP header's value
+@property (nonatomic, strong, readonly, nonnull) NSString *value;
 
 @end
+
+PA2_DEPRECATED_TYPE(2.0.0, PowerAuthAuthorizationHttpHeader, PowerAuthHttpHeader)
