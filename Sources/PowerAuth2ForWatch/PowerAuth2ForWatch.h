@@ -26,7 +26,7 @@ FOUNDATION_EXPORT const unsigned char PowerAuth2ForWatchVersionString[];
 #import <PowerAuth2ForWatch/PowerAuthMacros.h>
 #import <PowerAuth2ForWatch/PowerAuthWatchSDK.h>
 #import <PowerAuth2ForWatch/PowerAuthToken.h>
-#import <PowerAuth2ForWatch/PowerAuthAuthorizationHttpHeader.h>
+#import <PowerAuth2ForWatch/PowerAuthHttpHeader.h>
 #import <PowerAuth2ForWatch/PowerAuthAuthentication.h>
 #import <PowerAuth2ForWatch/PowerAuthConfiguration.h>
 #import <PowerAuth2ForWatch/PowerAuthErrorConstants.h>

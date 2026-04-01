@@ -21,7 +21,7 @@
 #import <PowerAuth2ForWatch/PowerAuthOperationTask.h>
 
 // Forward declarations...
-@class PowerAuthAuthorizationHttpHeader;
+@class PowerAuthHttpHeader;
 @class PowerAuthAuthentication;
 @protocol PowerAuthTokenStore;
 
@@ -63,7 +63,7 @@
 /**
  Returns a new token-based authorization header or nil, if it's not possible to generate the header.
  */
-- (nullable PowerAuthAuthorizationHttpHeader*) generateHeader;
+- (nullable PowerAuthHttpHeader*) generateHeader;
 
 /**
  Returns YES if both token objects are equal.
@@ -160,5 +160,13 @@
  Returns token object with given name if it's alreadu in local database or nil.
  */
 - (nullable PowerAuthToken*) localTokenWithName:(nonnull NSString*)name;
+
+/**
+ Generate authentication header with token with given name. Unlike `PowerAuthToken.generateHeader()`, this
+ asynchronous function guarantees that time used for the token digest calculation is always synchronized
+ with the server.
+ */
+- (nullable id<PowerAuthOperationTask>) generateAuthenticationHeaderWithName:(nonnull NSString *)name
+                                                                  completion:(nonnull void(^)(PowerAuthHttpHeader * _Nullable header, NSError * _Nullable error))completion;
 
 @end

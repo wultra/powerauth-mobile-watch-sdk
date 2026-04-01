@@ -60,6 +60,13 @@ PA2_EXTERN_C NSError * PA2MakeErrorInfo(NSInteger errorCode, NSString * message,
 /// If message is provided, then returns this message instead of default string.
 PA2_EXTERN_C NSString * PA2MakeDefaultErrorDescription(PowerAuthErrorCode errorCode, NSString * message);
 
+/// Create NSError with using PA2MakeError function and set it to optional errorPtr, which is type of `NSError**`.
+#define PA2SetError(errorPtr, errorCode, message)           \
+    do {                                                    \
+        if (errorPtr) {                                     \
+            *errorPtr = PA2MakeError(errorCode, message);   \
+        }                                                   \
+    } while (false);
 
 #if DEBUG
 /// Print error based on errno constant. Function is implemented only for DEBUG builds.

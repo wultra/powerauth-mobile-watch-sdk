@@ -14,15 +14,7 @@
  * limitations under the License.
  */
 
-// PA2_SHARED_SOURCE PowerAuth2ForWatch .
-// PA2_SHARED_SOURCE PowerAuth2ForExtensions .
-
 #import <PowerAuth2ForWatch/PowerAuthMacros.h>
-
-#if PA2_HAS_LACONTEXT == 1
-#import <LocalAuthentication/LocalAuthentication.h>
-#endif
-
 /**
  The `PowerAuthKeychainAuthentication` class allows you alter biometric dialog
  displayed when keychain item is protected with biometry.
@@ -40,17 +32,6 @@
  Initialize object with prompt that will be displayed to the user in case of biometric authentication.
  */
 - (nonnull instancetype) initWithPrompt:(nonnull NSString*)prompt;
-
-/**
- Contains LAContext in case that object was initialized with local authentication context.
- */
-@property (nonatomic, nullable, strong, readonly) LAContext * context API_UNAVAILABLE(watchos, tvos);
-
-/**
- Initialize object with local authentication context that allows you to alter more parameters
- of dialog displayed in case of biometric authentication.
- */
-- (nonnull instancetype) initWithContext:(nonnull LAContext*)context API_UNAVAILABLE(watchos, tvos);
 
 @end
 
