@@ -19,6 +19,7 @@
 
 #import <PowerAuth2ForWatch/PowerAuthToken.h>
 #import <PowerAuth2ForWatch/PowerAuthSessionStatusProvider.h>
+#import <PowerAuth2ForWatch/PowerAuthTimeSynchronizationService.h>
 
 #import "PA2PrivateTokenInterfaces.h"
 #import "PA2PrivateRemoteTokenProvider.h"
@@ -53,6 +54,10 @@
  */
 @property (nonatomic, weak, readonly) id<PA2PrivateRemoteTokenProvider> remoteTokenProvider;
 /**
+ An associated time synchronization service.
+ */
+@property (nonatomic, weak, readonly) id<PowerAuthTimeSynchronizationService> timeSynchronizationService;
+/**
  If YES then in-memory cache will be used for access speedup.
  By default is YES for IOS and watchOS and NO for IOS extensions.
  */
@@ -73,6 +78,7 @@
                     keychain:(PowerAuthKeychain*)keychain
               statusProvider:(id<PowerAuthSessionStatusProvider>)statusProvider
               remoteProvider:(id<PA2PrivateRemoteTokenProvider>)remoteProvider
+                 timeService:(id<PowerAuthTimeSynchronizationService>)timeService
                     dataLock:(id<PA2TokenDataLock>)dataLock
                    localLock:(id<NSLocking>)localLock;
 

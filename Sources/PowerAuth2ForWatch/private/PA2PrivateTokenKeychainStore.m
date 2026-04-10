@@ -25,6 +25,7 @@
 #import "PowerAuthAuthentication+Private.h"
 #import "PowerAuthHttpHeader+Private.h"
 #import "PA2CoreCryptoUtils.h"
+#import "PA2CompositeTask.h"
 
 #import <PowerAuth2ForWatch/PowerAuthErrorConstants.h>
 #import <PowerAuth2ForWatch/PowerAuthKeychain.h>
@@ -54,6 +55,7 @@
                     keychain:(PowerAuthKeychain*)keychain
               statusProvider:(id<PowerAuthSessionStatusProvider>)statusProvider
               remoteProvider:(id<PA2PrivateRemoteTokenProvider>)remoteProvider
+                 timeService:(id<PowerAuthTimeSynchronizationService>)timeService
                     dataLock:(id<PA2TokenDataLock>)dataLock
                    localLock:(id<NSLocking>)localLock
 {
@@ -62,6 +64,7 @@
         _sdkConfiguration = configuration;
         _statusProvider = statusProvider;
         _remoteTokenProvider = remoteProvider;
+        _timeSynchronizationService = timeService;
         _keychain = keychain;
         _tokenDataLock = dataLock;
         _localLock = localLock ? localLock : [[NSRecursiveLock alloc] init];
@@ -416,14 +419,44 @@
 - (nullable id<PowerAuthOperationTask>) generateAuthenticationHeaderWithName:(nonnull NSString *)name
                                                                   completion:(nonnull void (^)(PowerAuthHttpHeader * _Nullable, NSError * _Nullable))completion
 {
-    // TODO: implement time synchronization
-    return [self requestAccessTokenImpl:name authentication:nil completion:^(PowerAuthToken *token, NSError *error) {
-        PowerAuthHttpHeader * header = nil;
-        if (token) {
-            header = [self calculateTokenHeader:token.privateTokenData error:&error];
+    // Composite task and its completion closure
+    PA2CompositeTask * compositeTask = [[PA2CompositeTask alloc] initWithCancelBlock:nil];
+    void (^completeCompositeTask)(PowerAuthHttpHeader *, NSError *) = ^(PowerAuthHttpHeader * header, NSError * error) {
+        if ([compositeTask setCompleted]) {
+            completion(header, error);
         }
-        completion(header, error);
+    };
+    // Request for token
+    id<PowerAuthOperationTask> requestTask = [self requestAccessTokenImpl:name authentication:nil completion:^(PowerAuthToken *token, NSError *error) {
+        PowerAuthHttpHeader * header = nil;
+        BOOL completeOperation = YES;
+        if (token) {
+            if (_timeSynchronizationService.isTimeSynchronized) {
+                // Time is synchronized, so it's safe to calculate token.
+                header = [self calculateTokenHeader:token.privateTokenData error:&error];
+            } else {
+                // Time is not synchronized.
+                id<PowerAuthOperationTask> timeSyncTask = [_timeSynchronizationService synchronizeTimeWithCallback:^(NSError * _Nullable error) {
+                    PowerAuthHttpHeader * header = nil;
+                    if (!error) {
+                        // Time successfully synchronized
+                        header = [self calculateTokenHeader:token.privateTokenData error:&error];
+                    }
+                    // Operation can be finally completed
+                    completeCompositeTask(header, error);
+                } callbackQueue:nil];
+                [compositeTask replaceOperationTask:timeSyncTask];
+                // Operation cannot be completed yet
+                completeOperation = NO;
+            }
+        }
+        // Complete task if result is already known
+        if (completeOperation) {
+            completeCompositeTask(header, error);
+        }
     }];
+    [compositeTask replaceOperationTask:requestTask];
+    return compositeTask;
 }
 
 

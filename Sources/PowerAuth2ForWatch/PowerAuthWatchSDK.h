@@ -18,6 +18,7 @@
 #import <PowerAuth2ForWatch/PowerAuthToken.h>
 #import <PowerAuth2ForWatch/PowerAuthSessionStatusProvider.h>
 #import <PowerAuth2ForWatch/PowerAuthKeychainConfiguration.h>
+#import <PowerAuth2ForWatch/PowerAuthTimeSynchronizationService.h>
 #import <PowerAuth2ForWatch/PowerAuthHttpHeader.h>
 
 @interface PowerAuthWatchSDK : NSObject<PowerAuthSessionStatusProvider>
@@ -37,9 +38,15 @@
 @property (nonatomic, strong, nonnull, readonly) PowerAuthConfiguration * configuration;
 
 /**
+ Object providing functions to synchronize time with the server. The time is automatically synchronized with the server.
+ */
+@property (nonatomic, strong, nonnull, readonly) id<PowerAuthTimeSynchronizationService> timeSynchronizationService;
+
+/**
  A designated initializer.
  */
-- (nullable instancetype) initWithConfiguration:(nonnull PowerAuthConfiguration*)configuration;
+- (nullable instancetype) initWithConfiguration:(nonnull PowerAuthConfiguration*)configuration
+                                          error:(NSError*_Nullable*_Nullable)error;
 
 @end
 

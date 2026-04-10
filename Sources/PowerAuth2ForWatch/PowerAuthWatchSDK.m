@@ -16,12 +16,15 @@
 
 #import <PowerAuth2ForWatch/PowerAuthWatchSDK.h>
 #import <PowerAuth2ForWatch/PowerAuthKeychain.h>
+#import <PowerAuth2ForWatch/PowerAuthWCSessionManager.h>
 #import <PowerAuth2ForWatch/PowerAuthLog.h>
 
 #import "PA2WatchSynchronizationService.h"
 #import "PA2WatchRemoteTokenProvider.h"
 #import "PA2PrivateTokenKeychainStore.h"
+#import "PA2WatchTimeSynchronizationService.h"
 #import "PA2PrivateMacros.h"
+#import "PA2CompositeTask.h"
 
 #import "PA2WCSessionPacket_ActivationStatus.h"
 #import "PowerAuthWCSessionManager+Private.h"
@@ -42,22 +45,35 @@
 #pragma mark - Init
 
 - (id) initWithConfiguration:(PowerAuthConfiguration *)configuration
+                       error:(NSError**)error
 {
     self = [super init];
     if (self) {
+        if (![_configuration validateConfiguration]) {
+            PA2SetError(error, PowerAuthErrorCode_WrongParameter, @"Invalid configuration provided");
+            return nil;
+        }
         _configuration = [configuration copy];
         _lock = [[NSRecursiveLock alloc] init];
         
+        // Prepare time synchronization service
+        PA2WatchTimeSynchronizationService * timeService = [[PA2WatchTimeSynchronizationService alloc] initWithInstanceId:_configuration.instanceId];
+        [[PowerAuthWCSessionManager sharedInstance] registerDataHandler:timeService];
+        _timeSynchronizationService = timeService;
+        
         // Prepare remote token provider, which is using WatchConnectivity internally
         _remoteProvider = [[PA2WatchRemoteTokenProvider alloc] init];
+        
         // Prepare keychain token store
         PowerAuthKeychainConfiguration * keychainConfiguration = [PowerAuthKeychainConfiguration sharedInstance];
         PowerAuthKeychain * tokenStoreKeychain = [[PowerAuthKeychain alloc] initWithIdentifier:keychainConfiguration.keychainInstanceName_TokenStore];
+        
         // ..and finally, create token store
         PA2PrivateTokenKeychainStore * tokenStore = [[PA2PrivateTokenKeychainStore alloc] initWithConfiguration:_configuration
                                                                                                        keychain:tokenStoreKeychain
                                                                                                  statusProvider:self
                                                                                                  remoteProvider:_remoteProvider
+                                                                                                    timeService:_timeSynchronizationService
                                                                                                        dataLock:self
                                                                                                       localLock:_lock];
         tokenStore.allowInMemoryCache = NO;

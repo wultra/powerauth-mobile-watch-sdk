@@ -35,4 +35,5 @@ FOUNDATION_EXPORT const unsigned char PowerAuth2ForWatchVersionString[];
 #import <PowerAuth2ForWatch/PowerAuthLog.h>
 #import <PowerAuth2ForWatch/PowerAuthSystem.h>
 #import <PowerAuth2ForWatch/PowerAuthWCSessionManager.h>
+#import <PowerAuth2ForWatch/PowerAuthTimeSynchronizationService.h>
 #import <PowerAuth2ForWatch/PowerAuthDeprecated.h>
