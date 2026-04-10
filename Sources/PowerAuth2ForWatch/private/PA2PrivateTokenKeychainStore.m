@@ -198,12 +198,16 @@
         PA2SetError(error, PowerAuthErrorCode_Other, @"Protocol version or algorithm is unavailable in token calculation");
         return nil;
     }
+    
+    if (!_timeSynchronizationService.isTimeSynchronized) {
+        PowerAuthLog(@"WARNING: Time is not synchronized before token header calculation");
+    }
 
     NSData * tokenSecret = tokenData.secret;
     NSString * tokenIdentifier = tokenData.identifier;
 
     // Prepare data for HMAC
-    NSNumber * currentTimeMs = @((int64_t)([[NSDate date] timeIntervalSince1970] * 1000));
+    NSNumber * currentTimeMs = @((int64_t)([_timeSynchronizationService currentTime] * 1000));
     NSString * currentTimeString = [currentTimeMs stringValue];
     NSData * currentTimeData = [currentTimeString dataUsingEncoding:NSASCIIStringEncoding];
     NSData * versionData = [version dataUsingEncoding:NSASCIIStringEncoding];
