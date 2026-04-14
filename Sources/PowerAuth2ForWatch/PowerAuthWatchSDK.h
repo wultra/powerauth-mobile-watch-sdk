@@ -38,12 +38,13 @@
 @property (nonatomic, strong, nonnull, readonly) PowerAuthConfiguration * configuration;
 
 /**
- Object providing functions to synchronize time with the server. The time is automatically synchronized with the server.
+ Object providing functions to synchronize time with the server.
  */
 @property (nonatomic, strong, nonnull, readonly) id<PowerAuthTimeSynchronizationService> timeSynchronizationService;
 
 /**
  A designated initializer.
+ @param configuration Configuration object.
  */
 - (nullable instancetype) initWithConfiguration:(nonnull PowerAuthConfiguration*)configuration
                                           error:(NSError*_Nullable*_Nullable)error;

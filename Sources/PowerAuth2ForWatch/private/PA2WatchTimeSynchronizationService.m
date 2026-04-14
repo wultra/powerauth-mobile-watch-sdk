@@ -117,7 +117,9 @@
 
 - (BOOL) processReceivedPacket:(PA2WCSessionPacket*)packet error:(NSError**)error
 {
-    if (![packet.target isEqualToString:_target]) {
+    NSString * target = packet.target;
+    if (![target isEqualToString:_target] && ![target isEqualToString:PA2WCSessionPacket_RESPONSE_TARGET]) {
+        // Internal error in previous processing.
         PA2SetError(error, PowerAuthErrorCode_Other, @"Wrong target in processReceivedPacket function");
         return NO;
     }
