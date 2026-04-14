@@ -88,7 +88,7 @@
     PA2WCSessionPacket * packet = [PA2WCSessionPacket packetWithData:packetData target:_target];
     
     // Send packet with asynchronous response processing
-    [[PowerAuthWCSessionManager sharedInstance] sendPacketWithResponse:packet responseClass:[PA2WCSessionPacket_Success class] completion:^(PA2WCSessionPacket *response, NSError *error) {
+    [[PowerAuthWCSessionManager sharedInstance] sendPacketWithResponse:packet responseClass:[PA2WCSessionPacket_TimeSync class] completion:^(PA2WCSessionPacket *response, NSError *error) {
         if (response) {
             [self processReceivedPacket:response error:&error];
         }

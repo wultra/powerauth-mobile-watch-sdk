@@ -17,8 +17,11 @@
 #import <PowerAuth2ForWatch/PowerAuthTimeSynchronizationService.h>
 #import "PA2WCSessionDataHandler.h"
 
+/// Time synchronization service for watchOS.
 @interface PA2WatchTimeSynchronizationService : NSObject<PowerAuthTimeSynchronizationService, PA2WCSessionDataHandler>
 
+/// Construct service with instance identifier.
+/// - Parameter instanceId: Instance identifier.
 - (nonnull instancetype) initWithInstanceId:(nonnull NSString*)instanceId;
 
 @end

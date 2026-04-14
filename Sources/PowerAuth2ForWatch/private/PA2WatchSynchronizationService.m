@@ -140,21 +140,20 @@
            [packet.target hasPrefix:PA2WCSessionPacket_TOKEN_TARGET];
 }
 
-- (PA2WCSessionPacket*) sessionManager:(PowerAuthWCSessionManager*)manager responseForPacket:(PA2WCSessionPacket*)packet
+- (PA2WCSessionDataHandlerResponse*) sessionManager:(PowerAuthWCSessionManager*)manager responseForPacket:(PA2WCSessionPacket*)packet
 {
     if ([packet.target hasPrefix:PA2WCSessionPacket_SESSION_TARGET]) {
         return [self processSessionStatusPacket:packet];
     } else if ([packet.target hasPrefix:PA2WCSessionPacket_TOKEN_TARGET]) {
         return [self processTokenPacket:packet];
     }
-    NSError * error = PA2MakeError(PowerAuthErrorCode_WatchConnectivity, @"PA2WatchSynchronizationService: Can't process packet.");
-    return [PA2WCSessionPacket packetWithError:error];
+    return [PA2WCSessionDataHandlerResponse responseWithErrorMessage:@"PA2WatchSynchronizationService: Can't process packet."];
 }
 
 
 #pragma mark -
 
-- (PA2WCSessionPacket*) processSessionStatusPacket:(PA2WCSessionPacket*)packet
+- (PA2WCSessionDataHandlerResponse*) processSessionStatusPacket:(PA2WCSessionPacket*)packet
 {
     // Handle status packet received from iPhone
     NSString * errorMessage = nil;
@@ -186,15 +185,14 @@
     
     if (errorMessage) {
         // Return reply packet with error.
-        NSError * error = [NSError errorWithDomain:PowerAuthErrorDomain code:PowerAuthErrorCode_WatchConnectivity userInfo:@{ NSLocalizedDescriptionKey: errorMessage }];
-        return [PA2WCSessionPacket packetWithError:error];
+        return [PA2WCSessionDataHandlerResponse responseWithErrorMessage:errorMessage];
     }
     // Everything looks great, return Success packet.
-    return [PA2WCSessionPacket packetWithSuccess];
+    return [PA2WCSessionDataHandlerResponse responseWithPacket:[PA2WCSessionPacket packetWithSuccess]];
 }
 
 
-- (PA2WCSessionPacket*) processTokenPacket:(PA2WCSessionPacket*)packet
+- (PA2WCSessionDataHandlerResponse*) processTokenPacket:(PA2WCSessionPacket*)packet
 {
     NSString * errorMessage = nil;
     do {
@@ -243,13 +241,10 @@
 
     if (errorMessage) {
         // Return reply packet with error.
-        NSError * error = [NSError errorWithDomain:PowerAuthErrorDomain code:PowerAuthErrorCode_WatchConnectivity userInfo:@{ NSLocalizedDescriptionKey: errorMessage }];
-        return [PA2WCSessionPacket packetWithError:error];
+        return [PA2WCSessionDataHandlerResponse responseWithErrorMessage:errorMessage];
     }
     // Everything looks great, return Success packet.
-    return [PA2WCSessionPacket packetWithSuccess];
+    return [PA2WCSessionDataHandlerResponse responseWithPacket:[PA2WCSessionPacket packetWithSuccess]];
 }
-
-
 
 @end

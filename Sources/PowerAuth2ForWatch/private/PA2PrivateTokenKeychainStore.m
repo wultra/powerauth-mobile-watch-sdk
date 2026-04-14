@@ -135,11 +135,34 @@
     [_tokenDataLock unlockTokenStore:modified];
 }
 
+/// Get strong reference to the time synchronization service. If weak reference is nil then report an error.
+/// - Parameter error: Pointer to store the failure.
+- (id<PowerAuthTimeSynchronizationService>) strongTimeSynchronizationService:(NSError**)error
+{
+    id service = _timeSynchronizationService;
+    if (!service) {
+        PA2SetError(error, PowerAuthErrorCode_OperationCancelled, @"Time synchronization service is no longer valid");
+    }
+    return service;
+}
+
+/// Get strong reference to the session status provided. If weak reference is nil then report an error.
+/// - Parameter error: Pointer to store the failure.
+- (id<PowerAuthSessionStatusProvider>) strongSessionStatusProvider:(NSError**)error
+{
+    id provider = _statusProvider;
+    if (!provider) {
+        PA2SetError(error, PowerAuthErrorCode_OperationCancelled, @"Session status provider is no longer valid");
+    }
+    return provider;
+}
+
 #pragma mark - PowerAuthPrivateTokenStore protocol
 
 - (BOOL) canGenerateHeaderForToken:(PowerAuthToken *)token
 {
-    return [_statusProvider hasValidActivation] && [_statusProvider.activationIdentifier isEqualToString:token.privateTokenData.activationIdentifier];
+    id<PowerAuthSessionStatusProvider> statusProvider = _statusProvider;
+    return [statusProvider hasValidActivation] && [statusProvider.activationIdentifier isEqualToString:token.privateTokenData.activationIdentifier];
 }
 
 - (void) storeTokenData:(PA2PrivateTokenData*)tokenData
@@ -179,11 +202,21 @@
 - (nullable PowerAuthHttpHeader*) calculateTokenHeader:(PA2PrivateTokenData *)tokenData
                                                  error:(NSError *_Nullable *_Nullable)error
 {
-    if (!_statusProvider.hasValidActivation) {
+    // Capture strong reference to the essential objects
+    id<PowerAuthTimeSynchronizationService> timeService = [self strongTimeSynchronizationService:error];
+    if (!timeService) {
+        return nil;
+    }
+    id<PowerAuthSessionStatusProvider> statusProvider = [self strongSessionStatusProvider:error];
+    if (!statusProvider) {
+        return nil;
+    }
+    
+    if (!statusProvider.hasValidActivation) {
         PA2SetError(error, PowerAuthErrorCode_MissingActivation, @"Activation is no longer valid");
         return nil;
     }
-    if (![_statusProvider.activationIdentifier isEqualToString:tokenData.activationIdentifier]) {
+    if (![statusProvider.activationIdentifier isEqualToString:tokenData.activationIdentifier]) {
         PA2SetError(error, PowerAuthErrorCode_InvalidToken, @"Activation for this token is no longer valid");
         return nil;
     }
@@ -192,14 +225,14 @@
         return nil;
     }
     
-    NSString * version = _statusProvider.powerAuthProtocolVersion;
-    NSString * algorithm = _statusProvider.powerAuthAlgorithm;
+    NSString * version = statusProvider.powerAuthProtocolVersion;
+    NSString * algorithm = statusProvider.powerAuthAlgorithm;
     if (!version || !algorithm) {
         PA2SetError(error, PowerAuthErrorCode_Other, @"Protocol version or algorithm is unavailable in token calculation");
         return nil;
     }
-    
-    if (!_timeSynchronizationService.isTimeSynchronized) {
+    if (!timeService.isTimeSynchronized) {
+        // This will be replaced with strict error in some future version of SDK.
         PowerAuthLog(@"WARNING: Time is not synchronized before token header calculation");
     }
 
@@ -207,7 +240,7 @@
     NSString * tokenIdentifier = tokenData.identifier;
 
     // Prepare data for HMAC
-    NSNumber * currentTimeMs = @((int64_t)([_timeSynchronizationService currentTime] * 1000));
+    NSNumber * currentTimeMs = @((int64_t)([timeService currentTime] * 1000));
     NSString * currentTimeString = [currentTimeMs stringValue];
     NSData * currentTimeData = [currentTimeString dataUsingEncoding:NSASCIIStringEncoding];
     NSData * versionData = [version dataUsingEncoding:NSASCIIStringEncoding];
@@ -286,17 +319,22 @@
         }
         return nil;
     }
+    NSError * error = nil;
+    id<PowerAuthSessionStatusProvider> statusProvider = [self strongSessionStatusProvider:&error];
+    if (!statusProvider) {
+        completion(nil, error);
+        return nil;
+    }
     BOOL authenticationIsRequired = [_remoteTokenProvider authenticationIsRequired];
     if (!authentication && authenticationIsRequired) {
         completion(nil, PA2MakeError(PowerAuthErrorCode_WrongParameter, @"Authentication object is missing."));
         return nil;
     }
-    if (!_statusProvider.hasValidActivation) {
+    if (!statusProvider.hasValidActivation) {
         completion(nil, PA2MakeError(PowerAuthErrorCode_MissingActivation, @"Activation is no longer valid."));
         return nil;
     }
     
-    NSError * error = nil;
     PA2PrivateTokenData * tokenData = [self tokenDataForTokenName:name authentication:authentication error:&error];
     if (tokenData || error) {
         // The data is available, so the token can be returned synchronously
@@ -331,7 +369,7 @@
             groupTask = [[PA2CreateTokenTask alloc] initWithProvider:strongTokenProvider
                                                           tokenStore:self
                                                       authentication:authentication
-                                                        activationId:_statusProvider.activationIdentifier
+                                                        activationId:statusProvider.activationIdentifier
                                                            tokenName:name
                                                           sharedLock:_localLock];
             // Keep group task in the dictionary.
@@ -359,11 +397,16 @@
         }
         return nil;
     }
-    if (!_statusProvider.hasValidActivation) {
+    NSError * error = nil;
+    id<PowerAuthSessionStatusProvider> statusProvider = [self strongSessionStatusProvider:&error];
+    if (!statusProvider) {
+        completion(NO, error);
+        return nil;
+    }
+    if (!statusProvider.hasValidActivation) {
         completion(NO, PA2MakeError(PowerAuthErrorCode_MissingActivation, @"Activation is no longer valid."));
         return nil;
     }
-    NSError * error = nil;
     PA2PrivateTokenData * tokenData = [self tokenDataForTokenName:name authentication:nil error:&error];
     if (!tokenData) {
         completion(NO, error ? error : PA2MakeError(PowerAuthErrorCode_InvalidToken, @"Token not found."));
@@ -435,23 +478,27 @@
         PowerAuthHttpHeader * header = nil;
         BOOL completeOperation = YES;
         if (token) {
-            if (_timeSynchronizationService.isTimeSynchronized) {
-                // Time is synchronized, so it's safe to calculate token.
-                header = [self calculateTokenHeader:token.privateTokenData error:&error];
-            } else {
-                // Time is not synchronized.
-                id<PowerAuthOperationTask> timeSyncTask = [_timeSynchronizationService synchronizeTimeWithCallback:^(NSError * _Nullable error) {
-                    PowerAuthHttpHeader * header = nil;
-                    if (!error) {
-                        // Time successfully synchronized
-                        header = [self calculateTokenHeader:token.privateTokenData error:&error];
-                    }
-                    // Operation can be finally completed
-                    completeCompositeTask(header, error);
-                } callbackQueue:nil];
-                [compositeTask replaceOperationTask:timeSyncTask];
-                // Operation cannot be completed yet
-                completeOperation = NO;
+            // Capture strong reference to time service
+            id<PowerAuthTimeSynchronizationService> timeService = [self strongTimeSynchronizationService:&error];
+            if (timeService) {
+                if (timeService.isTimeSynchronized) {
+                    // Time is synchronized, so it's safe to calculate token.
+                    header = [self calculateTokenHeader:token.privateTokenData error:&error];
+                } else {
+                    // Time is not synchronized.
+                    id<PowerAuthOperationTask> timeSyncTask = [timeService synchronizeTimeWithCallback:^(NSError * _Nullable error) {
+                        PowerAuthHttpHeader * header = nil;
+                        if (!error) {
+                            // Time successfully synchronized
+                            header = [self calculateTokenHeader:token.privateTokenData error:&error];
+                        }
+                        // Operation can be finally completed
+                        completeCompositeTask(header, error);
+                    } callbackQueue:nil];
+                    [compositeTask replaceOperationTask:timeSyncTask];
+                    // Operation cannot be completed yet
+                    completeOperation = NO;
+                }
             }
         }
         // Complete task if result is already known

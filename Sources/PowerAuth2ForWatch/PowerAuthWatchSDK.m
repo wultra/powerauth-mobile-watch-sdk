@@ -49,7 +49,7 @@
 {
     self = [super init];
     if (self) {
-        if (![_configuration validateConfiguration]) {
+        if (![configuration validateConfiguration]) {
             PA2SetError(error, PowerAuthErrorCode_WrongParameter, @"Invalid configuration provided");
             return nil;
         }
