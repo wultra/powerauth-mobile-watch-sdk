@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Wultra s.r.o.
+ * Copyright 2026 Wultra s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-#import <PowerAuth2ForWatch/PowerAuthHttpHeader.h>
+#import <PowerAuth2ForWatch/PowerAuthTimeSynchronizationService.h>
+#import "PA2WCSessionDataHandler.h"
 
-@interface PowerAuthHttpHeader (Private)
+/// Time synchronization service for watchOS.
+@interface PA2WatchTimeSynchronizationService : NSObject<PowerAuthTimeSynchronizationService, PA2WCSessionDataHandler>
 
-/// Private constructor for header object construction.
-/// - Parameters:
-///   - key: HTTP header name.
-///   - value: HTTP header value.
-- (nonnull instancetype) initWithKey:(nonnull NSString*)key
-                               value:(nonnull NSString*)value;
+/// Construct service with instance identifier.
+/// - Parameter instanceId: Instance identifier.
+- (nonnull instancetype) initWithInstanceId:(nonnull NSString*)instanceId;
 
 @end
