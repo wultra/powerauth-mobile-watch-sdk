@@ -272,7 +272,8 @@
 				BF86E88F263C1F24004C8AE5 /* token */,
 				BF86E88D263C1F19004C8AE5 /* system */,
 			);
-			path = private;
+			name = private;
+			path = ../PowerAuth2ForWatchPrivate;
 			sourceTree = "<group>";
 		};
 		BF86E88D263C1F19004C8AE5 /* system */ = {
