@@ -19,7 +19,7 @@
 
 #import "PA2GroupedTask.h"
 #import "PA2PrivateMacros.h"
-#import <PowerAuth2ForWatch/PowerAuthLog.h>
+#import "PowerAuthLog.h"
 
 #pragma mark - Grouped task
 

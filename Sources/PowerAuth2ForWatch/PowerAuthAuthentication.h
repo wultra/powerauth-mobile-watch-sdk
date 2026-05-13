@@ -20,7 +20,7 @@
 // PowerAuht2ForExtensions and the shared file will be copied in the next
 // copy-shared-sources.sh run.
 
-#import <PowerAuth2ForWatch/PowerAuthMacros.h>
+#import "PowerAuthMacros.h"
 
 /** Class representing a multi-factor authentication object.
  */

@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-#import <PowerAuth2ForWatch/PowerAuthConfiguration.h>
-#import <PowerAuth2ForWatch/PowerAuthToken.h>
-#import <PowerAuth2ForWatch/PowerAuthSessionStatusProvider.h>
-#import <PowerAuth2ForWatch/PowerAuthKeychainConfiguration.h>
-#import <PowerAuth2ForWatch/PowerAuthTimeSynchronizationService.h>
-#import <PowerAuth2ForWatch/PowerAuthHttpHeader.h>
+#import "PowerAuthConfiguration.h"
+#import "PowerAuthToken.h"
+#import "PowerAuthSessionStatusProvider.h"
+#import "PowerAuthKeychainConfiguration.h"
+#import "PowerAuthTimeSynchronizationService.h"
+#import "PowerAuthHttpHeader.h"
 
 @interface PowerAuthWatchSDK : NSObject<PowerAuthSessionStatusProvider>
 

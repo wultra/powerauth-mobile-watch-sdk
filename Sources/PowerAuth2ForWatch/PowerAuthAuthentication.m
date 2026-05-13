@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-#import <PowerAuth2ForWatch/PowerAuthAuthentication.h>
-#import <PowerAuth2ForWatch/PowerAuthKeychainAuthentication.h>
-#import <PowerAuth2ForWatch/PowerAuthLog.h>
+#import "PowerAuthAuthentication.h"
+#import "PowerAuthKeychainAuthentication.h"
+#import "PowerAuthLog.h"
 #import "PowerAuthAuthentication+Private.h"
 
 @implementation PowerAuthAuthentication

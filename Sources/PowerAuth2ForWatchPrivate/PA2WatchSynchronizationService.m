@@ -25,9 +25,9 @@
 #import "PA2PrivateTokenData.h"
 #import "PA2PrivateTokenKeychainStore.h"
 
-#import <PowerAuth2ForWatch/PowerAuthKeychain.h>
-#import <PowerAuth2ForWatch/PowerAuthErrorConstants.h>
-#import <PowerAuth2ForWatch/PowerAuthLog.h>
+#import "PowerAuthKeychain.h"
+#import "PowerAuthErrorConstants.h"
+#import "PowerAuthLog.h"
 
 @implementation PA2WatchSynchronizationService
 {

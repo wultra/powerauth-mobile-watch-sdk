@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#import <PowerAuth2ForWatch/PowerAuthHttpHeader.h>
+#import "PowerAuthHttpHeader.h"
 
 @implementation PowerAuthHttpHeader
 

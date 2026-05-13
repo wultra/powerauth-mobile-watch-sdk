@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#import <PowerAuth2ForWatch/PowerAuthOperationTask.h>
+#import "PowerAuthOperationTask.h"
 
 /**
  The `PA2SimpleCancelable` object implements PowerAuthOperationTask

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#import <PowerAuth2ForWatch/PowerAuthMacros.h>
+#import "PowerAuthMacros.h"
 
 /// Class representing HTTP header generated in PowerAuth mobile SDK.
 @interface PowerAuthHttpHeader : NSObject

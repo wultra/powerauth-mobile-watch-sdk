@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 
-#import <PowerAuth2ForWatch/PowerAuthMacros.h>
+#import "PowerAuthMacros.h"
 
 // Reserved for future deprecations

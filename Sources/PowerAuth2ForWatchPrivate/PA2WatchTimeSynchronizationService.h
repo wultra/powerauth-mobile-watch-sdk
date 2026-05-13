@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#import <PowerAuth2ForWatch/PowerAuthTimeSynchronizationService.h>
+#import "PowerAuthTimeSynchronizationService.h"
 #import "PA2WCSessionDataHandler.h"
 
 /// Time synchronization service for watchOS.

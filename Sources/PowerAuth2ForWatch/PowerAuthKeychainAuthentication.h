@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#import <PowerAuth2ForWatch/PowerAuthMacros.h>
+#import "PowerAuthMacros.h"
 /**
  The `PowerAuthKeychainAuthentication` class allows you alter biometric dialog
  displayed when keychain item is protected with biometry.

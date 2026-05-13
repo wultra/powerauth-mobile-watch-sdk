@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#import <PowerAuth2ForWatch/PowerAuthConfiguration.h>
+#import "PowerAuthConfiguration.h"
 
 @implementation PowerAuthConfiguration
 

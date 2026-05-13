@@ -17,8 +17,8 @@
 // PA2_SHARED_SOURCE PowerAuth2ForWatch .
 // PA2_SHARED_SOURCE PowerAuth2ForExtensions .
 
-#import <PowerAuth2ForWatch/PowerAuthMacros.h>
-#import <PowerAuth2ForWatch/PowerAuthOperationTask.h>
+#import "PowerAuthMacros.h"
+#import "PowerAuthOperationTask.h"
 
 // Forward declarations...
 @class PowerAuthHttpHeader;

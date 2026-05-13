@@ -17,7 +17,7 @@
 // PA2_SHARED_SOURCE PowerAuth2ForWatch .
 // PA2_SHARED_SOURCE PowerAuth2ForExtensions .
 
-#import <PowerAuth2ForWatch/PowerAuthMacros.h>
+#import "PowerAuthMacros.h"
 
 /** Class that represents a PowerAuth2ForExtensions or PowerAuth2ForWatch instance configuration.
  */
