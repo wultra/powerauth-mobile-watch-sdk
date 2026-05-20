@@ -1,16 +1,11 @@
 # Platform CPU architectures
-ARCH_IOS="arm64 arm64e"
-ARCH_IOS_SIM="x86_64 arm64"
-ARCH_CATALYST="x86_64"
-ARCH_TVOS="arm64"
-ARCH_TVOS_SIM="x86_64 arm64"
-ARCH_WATCHOS="armv7k arm64_32"
-ARCH_WATCHOS_SIM="x86_64 i386 arm64"
+ARCH_WATCHOS="arm64 armv7k arm64_32"
+ARCH_WATCHOS_SIM="x86_64 arm64"
 
 # Minimum OS version
-MIN_VER_IOS="11.0"
-MIN_VER_TVOS="11.0"
-MIN_VER_CATALYST="10.15"
+MIN_VER_IOS="13.0"
+MIN_VER_TVOS="13.0"
+MIN_VER_CATALYST="13.5"
 MIN_VER_WATCHOS="4.0"
 
 # Minimum OS versions when legacy architectures are supported

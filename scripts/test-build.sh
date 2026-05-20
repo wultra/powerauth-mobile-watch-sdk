@@ -23,8 +23,8 @@ function USAGE
     echo ""
     echo "build-method is:"
     echo ""
-    echo "  lint                Use 'pod lib lint' to test iOS targets."
-    echo "  script              Use custom scripts for iOS targets."
+    echo "  lint                Use 'pod lib lint' to test build."
+    echo "  script              Use custom scripts for test build."
     echo "  all                 Run all methods to test the build."
     echo ""
     echo "options are:"
@@ -74,7 +74,7 @@ do
     shift
 done
 
-[[ x$DO_LINT$DO_SCRIPT == x00 ]] && FAILURE "Please specify buld mode: lint, script or all."
+[[ x$DO_LINT$DO_SCRIPT == x00 ]] && FAILURE "Please specify build mode: lint, script or all."
 
 REQUIRE_COMMAND pod
 
@@ -89,26 +89,20 @@ LOG_LINE
 LOG "Testing SDK for supported platforms..."
 LOG "  - macOS $(sw_vers -productVersion) ($(uname -m))"
 LOG "  - Xcode $(GET_XCODE_VERSION --full)"
-# LOG_LINE
-# LOG "Validating shared sources on Apple platform..."
-# LOG_LINE
-
-# "${SRC_ROOT}/proj-xcode/copy-shared-sources.sh" --test
-# WARNING "'proj-xcode/copy-shared-sources.sh --test' is disabled (see bug #482)"
 
 if [ x$DO_SCRIPT == x1 ]; then       
     LOG_LINE -a
     LOG "Validating build for Apple platforms (script mode)..."
     LOG_LINE
-    "${TOP}/ios-build-extensions.sh" $SCRIPT_VERBOSE $BUILD_TARGET_PLATFORM
+    "${TOP}/watchos-build-sdk.sh" $SCRIPT_VERBOSE
 fi
 
 if [ x$DO_LINT = x1 ]; then
     LOG_LINE -a
     LOG "Validating build for Apple platforms (lint mode)..."
     LOG_LINE
-    [[ $BUILD_TARGET_PLATFORM == 'extensions' ]] && pod $POD_VERBOSE lib lint PowerAuth2ForExtensions.podspec
-    [[ $BUILD_TARGET_PLATFORM == 'watchos' ]] && pod $POD_VERBOSE lib lint PowerAuth2ForWatch.podspec
+
+    pod $POD_VERBOSE lib lint PowerAuth2ForWatch.podspec
 fi
 
 ####
