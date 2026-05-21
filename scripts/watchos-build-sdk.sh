@@ -239,7 +239,7 @@ function BUILD_COMMAND
 # Parameters:
 #   $1   - output directory for the merged framework
 #   $2+  - paths to the per-arch frameworks to merge
-# Prints the path of the merged (or single) framework to stdout.
+# Sets global PLATFORM_FRAMEWORK with the path to the merged framework.
 # -----------------------------------------------------------------------------
 function MERGE_PLATFORM_LIBS
 {
@@ -248,7 +248,8 @@ function MERGE_PLATFORM_LIBS
     local FRAMEWORKS=("$@")
 
     if [[ ${#FRAMEWORKS[@]} -eq 1 ]]; then
-        echo "${FRAMEWORKS[0]}"
+        DEBUG_LOG "Using single slice framework as is: ${FRAMEWORKS[0]}"
+        PLATFORM_FRAMEWORK="${FRAMEWORKS[0]}"
         return 0
     fi
 
@@ -256,10 +257,10 @@ function MERGE_PLATFORM_LIBS
     local FW_NAME=$(basename "${BASE_FW}")
     local BINARY_NAME="${FW_NAME%.framework}"
     local MERGED_FW="${MERGED_DIR}/${FW_NAME}"
-
+    # Prepare framework structure by copying headers and other stuff from the first slice.
     $MD "${MERGED_DIR}"
     $CP -R "${BASE_FW}" "${MERGED_DIR}/"
-
+    # Prepare lipo command input
     local LIPO_INPUTS=()
     for FW in "${FRAMEWORKS[@]}"; do
         LIPO_INPUTS+=("${FW}/${BINARY_NAME}")
@@ -268,7 +269,7 @@ function MERGE_PLATFORM_LIBS
     DEBUG_LOG "Merging ${#FRAMEWORKS[@]} slices into fat framework: ${MERGED_FW}"
     lipo -create "${LIPO_INPUTS[@]}" -output "${MERGED_FW}/${BINARY_NAME}"
 
-    echo "${MERGED_FW}"
+    PLATFORM_FRAMEWORK="${MERGED_FW}"
 }
 
 # -----------------------------------------------------------------------------
@@ -297,10 +298,13 @@ function BUILD_LIBRARY
             BUILD_COMMAND $PLATFORM $ARCH $FULL_REBUILD
         done
 
-        local MERGED_FW
-        MERGED_FW=$(MERGE_PLATFORM_LIBS "${TMP_DIR}/${PLATFORM}_fat" "${ALL_FAT_LIBS[@]}")
-        XCFW_ARGS+="-framework ${MERGED_FW} "
-        DEBUG_LOG "  - source fw: ${MERGED_FW}"
+        PLATFORM_FRAMEWORK=
+        MERGE_PLATFORM_LIBS "${TMP_DIR}/${PLATFORM}_fat" "${ALL_FAT_LIBS[@]}"
+
+        [[ -z "$PLATFORM_FRAMEWORK" ]] && FAILURE "No fat framework generated for platform $PLATFORM"
+
+        XCFW_ARGS+="-framework ${PLATFORM_FRAMEWORK} "
+        DEBUG_LOG "  - source fw: ${PLATFORM_FRAMEWORK}"
     done
 
     LOG_LINE
