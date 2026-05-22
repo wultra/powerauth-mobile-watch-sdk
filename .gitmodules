@@ -1,4 +1,4 @@
 [submodule "cc7"]
 	path = cc7
-	url = ../cc7.git
+	url = https://github.com/wultra/cc7.git
 	branch = develop
