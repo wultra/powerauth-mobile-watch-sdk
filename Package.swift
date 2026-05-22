@@ -24,7 +24,7 @@ let package = Package(
             path: "Sources",
             exclude: [
                 "PowerAuth2ForWatch/Info.plist",
-                "PowerAuth2ForWatch/PowerAuth2ForWatch.modulemap"
+                "PowerAuth2ForWatch/module.modulemap"
             ],
             sources: [
                 "PowerAuth2ForWatch",
@@ -32,6 +32,26 @@ let package = Package(
             ],
             publicHeadersPath: "PowerAuth2ForWatch",
             cSettings: [
+                // Required for "Header.h" style imports
+                .headerSearchPath("PowerAuth2ForWatch"),
+                .headerSearchPath("PowerAuth2ForWatchPrivate"),
+                .define("PA2_EXTENSION_SDK", to: "1"),
+                .define("PA2_WATCH_SDK", to: "1")
+            ]
+        ),
+        
+        // --- PowerAuth2ForWatchTests ---
+        
+        .testTarget(
+            name: "PowerAuth2ForWatchTests",
+            dependencies: [ "PowerAuth2ForWatch" ],
+            path: "Sources",
+            sources: [
+                "PowerAuth2ForWatchTests"
+            ],
+            cSettings: [
+                // Required for <FW/Header.h> style imports
+                .headerSearchPath("."),
                 // Required for "Header.h" style imports
                 .headerSearchPath("PowerAuth2ForWatch"),
                 .headerSearchPath("PowerAuth2ForWatchPrivate"),
