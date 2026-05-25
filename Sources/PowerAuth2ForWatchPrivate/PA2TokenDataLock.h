@@ -14,24 +14,26 @@
  * limitations under the License.
  */
 
+// PA2_SHARED_SOURCE PowerAuth2ForWatch private
+// PA2_SHARED_SOURCE PowerAuth2ForExtensions private
+
 #import "PowerAuthMacros.h"
-/**
- The `PowerAuthKeychainAuthentication` class allows you alter biometric dialog
- displayed when keychain item is protected with biometry.
- */
-@interface PowerAuthKeychainAuthentication : NSObject
-
-- (nonnull instancetype) init NS_UNAVAILABLE;
 
 /**
- Contains prompt in case that object was initialized with prompt.
+ The `PA2TokenDataLock` defines interface that allows token store
+ acquire an exclusive access to shared token data.
  */
-@property (nonatomic, nullable, strong, readonly) NSString * prompt;
+@protocol PA2TokenDataLock <NSObject>
 
 /**
- Initialize object with prompt that will be displayed to the user in case of biometric authentication.
+ Lock token store data and return whether the local cached context
+ should be invalidated.
  */
-- (nonnull instancetype) initWithPrompt:(nonnull NSString*)prompt;
+- (BOOL) lockTokenStore;
+
+/**
+ Unlock token store data and mark that token store has been modified.
+ */
+- (void) unlockTokenStore:(BOOL)contentModified;
 
 @end
-

@@ -18,7 +18,7 @@
 // PA2_SHARED_SOURCE PowerAuth2ForExtensions private
 
 #import "PA2CoreCryptoUtils.h"
-#import <PowerAuth2ForWatch/PowerAuthLog.h>
+#import "PowerAuthLog.h"
 
 #include <openssl/evp.h>
 #include <openssl/param_build.h>

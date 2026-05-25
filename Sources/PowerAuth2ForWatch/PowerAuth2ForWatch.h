@@ -23,17 +23,17 @@ FOUNDATION_EXPORT double PowerAuth2ForWatchVersionNumber;
 FOUNDATION_EXPORT const unsigned char PowerAuth2ForWatchVersionString[];
 
 // Import all public headers...
-#import <PowerAuth2ForWatch/PowerAuthMacros.h>
-#import <PowerAuth2ForWatch/PowerAuthWatchSDK.h>
-#import <PowerAuth2ForWatch/PowerAuthToken.h>
-#import <PowerAuth2ForWatch/PowerAuthHttpHeader.h>
-#import <PowerAuth2ForWatch/PowerAuthAuthentication.h>
-#import <PowerAuth2ForWatch/PowerAuthConfiguration.h>
-#import <PowerAuth2ForWatch/PowerAuthErrorConstants.h>
-#import <PowerAuth2ForWatch/PowerAuthKeychain.h>
-#import <PowerAuth2ForWatch/PowerAuthKeychainConfiguration.h>
-#import <PowerAuth2ForWatch/PowerAuthLog.h>
-#import <PowerAuth2ForWatch/PowerAuthSystem.h>
-#import <PowerAuth2ForWatch/PowerAuthWCSessionManager.h>
-#import <PowerAuth2ForWatch/PowerAuthTimeSynchronizationService.h>
-#import <PowerAuth2ForWatch/PowerAuthDeprecated.h>
+#import "PowerAuthMacros.h"
+#import "PowerAuthWatchSDK.h"
+#import "PowerAuthToken.h"
+#import "PowerAuthHttpHeader.h"
+#import "PowerAuthAuthentication.h"
+#import "PowerAuthConfiguration.h"
+#import "PowerAuthErrorConstants.h"
+#import "PowerAuthKeychain.h"
+#import "PowerAuthKeychainConfiguration.h"
+#import "PowerAuthLog.h"
+#import "PowerAuthSystem.h"
+#import "PowerAuthWCSessionManager.h"
+#import "PowerAuthTimeSynchronizationService.h"
+#import "PowerAuthDeprecated.h"

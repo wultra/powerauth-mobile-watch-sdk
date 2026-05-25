@@ -17,8 +17,8 @@
 // PA2_SHARED_SOURCE PowerAuth2ForWatch .
 // PA2_SHARED_SOURCE PowerAuth2ForExtensions .
 
-#import <PowerAuth2ForWatch/PowerAuthKeychainConfiguration.h>
-#import <PowerAuth2ForWatch/PowerAuthKeychainAuthentication.h>
+#import "PowerAuthKeychainConfiguration.h"
+#import "PowerAuthKeychainAuthentication.h"
 
 /**
  Enum encapsulating possible Keychain query result.

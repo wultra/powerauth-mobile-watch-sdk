@@ -15,4 +15,4 @@
  */
 
 
-#import <PowerAuth2ForWatch/PowerAuthDeprecated.h>
+#import "PowerAuthDeprecated.h"

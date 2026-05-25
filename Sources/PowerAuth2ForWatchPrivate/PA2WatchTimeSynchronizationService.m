@@ -22,7 +22,7 @@
 #import "PA2CompositeTask.h"
 #import "PowerAuthWCSessionManager+Private.h"
 
-#import <PowerAuth2ForWatch/PowerAuthLog.h>
+#import "PowerAuthLog.h"
 
 
 @implementation PA2WatchTimeSynchronizationService

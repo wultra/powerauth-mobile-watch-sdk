@@ -3,7 +3,7 @@
 set -e
 set +v
 ###############################################################################
-# PowerAuth2ForExtensions / PowerAuth2ForWatch build
+# PowerAuth2ForWatch build
 #
 # The main purpose of this script is build and prepare files hierarchy for 
 # cocoapod library distribution. The result of the build process is a xcframework 
@@ -34,11 +34,6 @@ XCODE_DIR="${SRC_ROOT}"
 # Platforms & CPU architectures
 #
 
-# iOS / tvOS
-EXT_FRAMEWORK="PowerAuth2ForExtensions"
-EXT_PLATFORMS="iOS iOS_Simulator macOS_Catalyst"
-EXT_PLATFORMS_TVOS="tvOS tvOS_Simulator"
-EXT_PROJECT="${XCODE_DIR}/PowerAuth2ForExtensions.xcodeproj"
 # WatchOS
 WOS_FRAMEWORK="PowerAuth2ForWatch"
 WOS_PLATFORMS="watchOS watchOS_Simulator"
@@ -56,13 +51,7 @@ OPT_LEGACY_ARCH=0
 OPT_USE_BITCODE=0
 OPT_WEAK_TVOS=0
 
-if [[ $BUILD_TARGET_PLATFORM == 'extensions' ]]; then
-    DO_WATCHOS=0
-    DO_EXTENSIONS=1
-else
-    DO_WATCHOS=1
-    DO_EXTENSIONS=0
-fi
+DO_WATCHOS=1
 
 # -----------------------------------------------------------------------------
 # USAGE prints help and exits the script with error code from provided parameter
@@ -72,18 +61,12 @@ fi
 function USAGE
 {
     echo ""
-    echo "Usage:  $CMD  [options] platforms"
-    echo ""
-    echo "platform is:"
-    echo ""
-    echo "  watchos           for watchOS library build"
-    echo "  extensions        for iOS and tvOS extensions build"
+    echo "Usage:  $CMD  [options]"
     echo ""
     echo "options are:"
     echo ""
     echo "  -nc | --no-clean  disable 'clean' before 'build'"
     echo "                    also disables temporary data cleanup after build"
-    echo "  --optional-tvos   tvOS is not required when SDK is not installed"
     echo "  -v0               turn off all prints to stdout"
     echo "  -v1               print only basic log about build progress"
     echo "  -v2               print full build log with rich debug info"
@@ -115,12 +98,12 @@ function USAGE
 #   'generic/platform=iOS'.
 #
 # GET_PLATFORM_TARGET
-#   Print a build target for given build platform. For example, for 'iOS'
-#   function prints 'PowerAuth2ForExtensions_iOS'.
+#   Print a build target for given build platform. For example, for 'watchOS'
+#   function prints 'PowerAuth2ForWatch'.
 #
 # GET_PLATFORM_PROJECT
 #   Print a path to xcode project for given build platform. For example, for 'iOS'
-#   function prints '.../PowerAuth2ForExtensions.xcodeproj'.
+#   function prints '.../PowerAuth2ForWatch.xcodeproj'.
 #
 # GET_PLATFORM_MIN_OS_VER
 #   Print a minimum supported OS version for given build platform. For example, 
@@ -128,7 +111,7 @@ function USAGE
 #
 # GET_PLATFORM_SCHEME
 #   Print build scheme for given build platform. For example, for 'iOS'
-#   function prints 'PowerAuth2ForExtensions_iOS'
+#   function prints 'PowerAuth2ForWatch'
 #
 # Parameters:
 #   $1   - build platform (e.g. 'iOS', 'tvOS', etc...)
@@ -136,11 +119,6 @@ function USAGE
 function GET_PLATFORM_ARCH
 {
     case $1 in
-        iOS)                echo ${ARCH_IOS} ;;
-        iOS_Simulator)      echo ${ARCH_IOS_SIM} ;;
-        macOS_Catalyst)     echo ${ARCH_CATALYST} ;;
-        tvOS)               echo ${ARCH_TVOS} ;;
-        tvOS_Simulator)     echo ${ARCH_TVOS_SIM} ;;
         watchOS)            echo ${ARCH_WATCHOS} ;;
         watchOS_Simulator)  echo ${ARCH_WATCHOS_SIM} ;;
         *) FAILURE "Cannot determine architecture. Unsupported platform: '$1'" ;;
@@ -149,11 +127,6 @@ function GET_PLATFORM_ARCH
 function GET_PLATFORM_SDK
 {
     case $1 in
-        iOS)                echo 'iphoneos' ;;
-        iOS_Simulator)      echo 'iphonesimulator' ;;
-        macOS_Catalyst)     echo 'macosx' ;;
-        tvOS)               echo 'appletvos' ;;
-        tvOS_Simulator)     echo 'appletvsimulator' ;;
         watchOS)            echo 'watchos' ;;
         watchOS_Simulator)  echo 'watchsimulator' ;;
         *) FAILURE "Cannot determine platform SDK. Unsupported platform: '$1'" ;;
@@ -162,11 +135,6 @@ function GET_PLATFORM_SDK
 function GET_PLATFORM_DESTINATION
 {
     case $1 in
-        iOS)                echo 'generic/platform=iOS' ;;
-        iOS_Simulator)      echo 'generic/platform=iOS Simulator' ;;
-        macOS_Catalyst)     echo 'generic/platform=macOS,variant=Mac Catalyst' ;;
-        tvOS)               echo 'generic/platform=tvOS' ;;
-        tvOS_Simulator)     echo 'generic/platform=tvOS Simulator' ;;
         watchOS)            echo 'generic/platform=watchOS' ;;
         watchOS_Simulator)  echo 'generic/platform=watchOS Simulator' ;;
         *) FAILURE "Cannot determine platform destination. Unsupported platform: '$1'" ;;
@@ -175,8 +143,6 @@ function GET_PLATFORM_DESTINATION
 function GET_PLATFORM_TARGET
 {
     case $1 in
-        iOS | iOS_Simulator | macOS_Catalyst)   echo 'PowerAuth2ForExtensions_ios' ;;
-        tvOS | tvOS_Simulator)                  echo 'PowerAuth2ForExtensions_tvos' ;;
         watchOS | watchOS_Simulator)            echo 'PowerAuth2ForWatch' ;;
         *) FAILURE "Cannot determine platform target. Unsupported platform: '$1'" ;;
     esac
@@ -184,8 +150,6 @@ function GET_PLATFORM_TARGET
 function GET_PLATFORM_PROJECT
 {
     case $1 in
-        iOS | iOS_Simulator | macOS_Catalyst)   echo "${XCODE_DIR}/PowerAuth2ForExtensions.xcodeproj" ;;
-        tvOS | tvOS_Simulator)                  echo "${XCODE_DIR}/PowerAuth2ForExtensions.xcodeproj" ;;
         watchOS | watchOS_Simulator)            echo "${XCODE_DIR}/PowerAuth2ForWatch.xcodeproj" ;;
         *) FAILURE "Cannot determine platform project. Unsupported platform: '$1'" ;;
     esac
@@ -193,9 +157,6 @@ function GET_PLATFORM_PROJECT
 function GET_PLATFORM_MIN_OS_VER
 {
     case $1 in
-        iOS | iOS_Simulator)            echo ${MIN_VER_IOS} ;;
-        macOS_Catalyst)                 echo ${MIN_VER_CATALYST} ;;
-        tvOS | tvOS_Simulator)          echo ${MIN_VER_TVOS} ;;
         watchOS | watchOS_Simulator)    echo ${MIN_VER_WATCHOS} ;;
         *) FAILURE "Cannot determine minimum supported OS version. Unsupported platform: '$1'" ;;
     esac
@@ -203,8 +164,6 @@ function GET_PLATFORM_MIN_OS_VER
 function GET_PLATFORM_SCHEME
 {
     case $1 in
-        iOS | iOS_Simulator | macOS_Catalyst)   echo 'PowerAuth2ForExtensions_iOS' ;;
-        tvOS | tvOS_Simulator)                  echo 'PowerAuth2ForExtensions_tvOS' ;;
         watchOS | watchOS_Simulator)            echo 'PowerAuth2ForWatch' ;;
         *) FAILURE "Cannot determine build scheme. Unsupported platform: '$1'" ;;
     esac
@@ -228,17 +187,19 @@ function GET_BITCODE_OPTION
 # Performs xcodebuild command for a single platform (iphone / simulator)
 # Parameters:
 #   $1   - platform (iOS, iOS_Simulator, etc...)
-#   $2   - set to 1, to clean the build folder
+#   $2   - architecture (arm64, arm64_32, etc...)
+#   $3   - set to 1, to clean the build folder
 # -----------------------------------------------------------------------------
 function BUILD_COMMAND
 {
     local PLATFORM="$1"
-    local DO_CLEAN="$2"
+    local ARCHITECTURE="$2"
+    local DO_CLEAN="$3"
     
-    local PLATFORM_DIR=$"${TMP_DIR}/${PLATFORM}"
+    local PLATFORM_DIR=$"${TMP_DIR}/${PLATFORM}_${ARCHITECTURE}"
     local ARCHIVE_PATH="${PLATFORM_DIR}/${OUT_FW}.xcarchive"
     
-    local PLATFORM_ARCHS="$(GET_PLATFORM_ARCH $PLATFORM)"
+    local PLATFORM_ARCHS="$ARCHITECTURE"
     local PLATFORM_SDK="$(GET_PLATFORM_SDK $PLATFORM)"
     local PLATFORM_TARGET="$(GET_PLATFORM_TARGET $PLATFORM)"
     local PLATFORM_DEST="$(GET_PLATFORM_DESTINATION $PLATFORM)"
@@ -249,7 +210,7 @@ function BUILD_COMMAND
     local BITCODE_OPTION=$(GET_BITCODE_OPTION)
     
     LOG_LINE
-    LOG "Building ${PLATFORM} (${MIN_SDK_VER}+) for architectures ${PLATFORM_ARCHS}"
+    LOG "Building ${PLATFORM} (${MIN_SDK_VER}+) for architecture ${PLATFORM_ARCHS}"
     
     DEBUG_LOG "Executing 'archive' for target ${PLATFORM_TARGET} ${PLATFORM_TARGET} :: ${PLATFORM_ARCHS}"
     
@@ -259,7 +220,6 @@ function BUILD_COMMAND
     COMMAND_LINE+=" -destination \"${PLATFORM_DEST}\""
     COMMAND_LINE+=" SKIP_INSTALL=NO BUILD_LIBRARIES_FOR_DISTRIBUTION=YES"
     COMMAND_LINE+=" ${DEPLOYMENT_TARGETS} ${BITCODE_OPTION}"
-    [[ $PLATFORM == 'macOS_Catalyst' ]] && COMMAND_LINE+=" SUPPORTS_MACCATALYST=YES"
     [[ $VERBOSE -lt 2 ]] && COMMAND_LINE+=" -quiet"
     
     DEBUG_LOG ${COMMAND_LINE}
@@ -273,6 +233,46 @@ function BUILD_COMMAND
 
 
 # -----------------------------------------------------------------------------
+# Merge multiple single-arch frameworks for the same platform into one fat
+# framework using lipo. Required because xcodebuild -create-xcframework
+# rejects more than one framework per platform+environment combination.
+# Parameters:
+#   $1   - output directory for the merged framework
+#   $2+  - paths to the per-arch frameworks to merge
+# Sets global PLATFORM_FRAMEWORK with the path to the merged framework.
+# -----------------------------------------------------------------------------
+function MERGE_PLATFORM_LIBS
+{
+    local MERGED_DIR="$1"
+    shift
+    local FRAMEWORKS=("$@")
+
+    if [[ ${#FRAMEWORKS[@]} -eq 1 ]]; then
+        DEBUG_LOG "Using single slice framework as is: ${FRAMEWORKS[0]}"
+        PLATFORM_FRAMEWORK="${FRAMEWORKS[0]}"
+        return 0
+    fi
+
+    local BASE_FW="${FRAMEWORKS[0]}"
+    local FW_NAME=$(basename "${BASE_FW}")
+    local BINARY_NAME="${FW_NAME%.framework}"
+    local MERGED_FW="${MERGED_DIR}/${FW_NAME}"
+    # Prepare framework structure by copying headers and other stuff from the first slice.
+    $MD "${MERGED_DIR}"
+    $CP -R "${BASE_FW}" "${MERGED_DIR}/"
+    # Prepare lipo command input
+    local LIPO_INPUTS=()
+    for FW in "${FRAMEWORKS[@]}"; do
+        LIPO_INPUTS+=("${FW}/${BINARY_NAME}")
+    done
+
+    DEBUG_LOG "Merging ${#FRAMEWORKS[@]} slices into fat framework: ${MERGED_FW}"
+    lipo -create "${LIPO_INPUTS[@]}" -output "${MERGED_FW}/${BINARY_NAME}"
+
+    PLATFORM_FRAMEWORK="${MERGED_FW}"
+}
+
+# -----------------------------------------------------------------------------
 # Build xcframework
 # -----------------------------------------------------------------------------
 function BUILD_LIBRARY
@@ -283,25 +283,30 @@ function BUILD_LIBRARY
     LOG "  - Xcode $(GET_XCODE_VERSION --full)"
     LOG_LINE
 
-    ALL_FAT_LIBS=()
-    
-    BUILD_PATCH_ARCHITECTURES
-    
     [[ x$FULL_REBUILD == x1 ]] && CLEAN_COMMAND
-    
-    for PLATFORM in ${PLATFORMS}
-    do
-        BUILD_COMMAND $PLATFORM $FULL_REBUILD
-    done
-    
-    LOG_LINE
-    LOG "Creating final ${OUT_FW}.xcframework..."
+
     local XCFW_PATH="${OUT_DIR}/${OUT_FW}.xcframework"
     local XCFW_ARGS=
-    for ARG in ${ALL_FAT_LIBS[@]}; do
-        XCFW_ARGS+="-framework ${ARG} "
-        DEBUG_LOG "  - source fw: ${ARG}"
+
+    for PLATFORM in ${PLATFORMS}
+    do
+        ALL_FAT_LIBS=()
+        for ARCH in $(GET_PLATFORM_ARCH $PLATFORM)
+        do
+            BUILD_COMMAND $PLATFORM $ARCH $FULL_REBUILD
+        done
+
+        PLATFORM_FRAMEWORK=
+        MERGE_PLATFORM_LIBS "${TMP_DIR}/${PLATFORM}_fat" "${ALL_FAT_LIBS[@]}"
+
+        [[ -z "$PLATFORM_FRAMEWORK" ]] && FAILURE "No fat framework generated for platform $PLATFORM"
+
+        XCFW_ARGS+="-framework ${PLATFORM_FRAMEWORK} "
+        DEBUG_LOG "  - source fw: ${PLATFORM_FRAMEWORK}"
     done
+
+    LOG_LINE
+    LOG "Creating final ${OUT_FW}.xcframework..."
     DEBUG_LOG "  - target fw: ${XCFW_PATH}"
     $MD "${OUT_DIR}"
     xcodebuild -create-xcframework $XCFW_ARGS -output "${XCFW_PATH}"
@@ -331,80 +336,11 @@ function CLEAN_COMMAND
     eval $COMMAND_LINE
 }
 
-function DO_BUILD_APPEXT
-{
-    OUT_FW=${EXT_FRAMEWORK}
-    PLATFORMS="${EXT_PLATFORMS}"
-    BUILD_LIBRARY
-}
-
 function DO_BUILD_WATCHOS
 {
     OUT_FW=${WOS_FRAMEWORK}
     PLATFORMS="${WOS_PLATFORMS}"
     BUILD_LIBRARY
-}
-
-# -----------------------------------------------------------------------------
-# Test whether tvOS SDK is installed locally. Prints "1" to stdout if yes,
-# otherwise "0".
-# -----------------------------------------------------------------------------
-function FIND_TVOS_SDK
-{
-    local old_VERBOSE=$VERBOSE; 
-    VERBOSE=0; PUSH_DIR "$XCODE_DIR"
-    local project='PowerAuth2ForExtensions.xcodeproj'
-    local scheme='PowerAuth2ForExtensions_tvOS'
-    # This is quite hardcore, but unfortunatelly there's no command line option to test whether SDK is really installed.
-    # The idea behind this is that when tvOS SDK is installed, then there are already a some run or build destinations for it.
-    # If tvOS SDK is not installed, then the placeholder SDK is reported, with "not installed" error in the description. 
-    set +e
-    xcodebuild -showdestinations -project $project -scheme $scheme -quiet 2>/dev/null | grep 'not installed' > /dev/null 2>&1;
-    if (($? == 0)); then
-        echo "0"    # Grep found 'not installed' so SDK is not available
-    else
-        echo "1"    # Grep did not find the requested string, so SDK is not available
-    fi
-    set -e
-    POP_DIR; VERBOSE=$old_VERBOSE
-}
-
-# -----------------------------------------------------------------------------
-# Patch PLATFORMS list depending on the current Xcode capability
-# -----------------------------------------------------------------------------
-function DO_PATCH_TARGETS
-{
-    # tvOS is enforced (the default behavior)
-    local use_tvos=1
-    if (( $(GET_XCODE_VERSION --major) >= 14 )); then
-        # If Xcode version is greater or equal to 14, then additional SDKs are optional
-        local tvos=$(FIND_TVOS_SDK)
-        case "$tvos" in
-            0)
-                if [ x$OPT_WEAK_TVOS == x0 ]; then
-                    LOG_LINE
-                    LOG "tvOS SDK is optional since Xcode 14 but is required by PowerAuth mobile SDK."
-                    LOG "You can use the following solutions to fix this problem:"
-                    LOG ""
-                    LOG " 1. download all optional platform SDKs:"
-                    LOG "      xcodebuild -downloadAllPlatforms"
-                    LOG ""
-                    LOG " 2. Skip tvOS platform if it's not important to your project:"
-                    LOG "      add '--optional-tvos' switch to this build script"
-                    LOG_LINE
-                    FAILURE "tvOS SDK is not installed."
-                else
-                    WARNING "tvOS SDK is not installed, so skipping this platform in the build."
-                    use_tvos=0
-                fi
-                ;;
-            1) DEBUG_LOG "tvOS SDK appears to be installed" ;;
-            *) FAILURE "Unexpected result from tvOS SDK evaluation: $tvos" ;;
-        esac
-    fi
-    if [ x$use_tvos == x1 ]; then
-        EXT_PLATFORMS+=" $EXT_PLATFORMS_TVOS"
-    fi
 }
 
 ###############################################################################
@@ -416,9 +352,6 @@ do
     case "$opt" in
         watchos)
             DO_WATCHOS=1
-            ;;
-        extensions)
-            DO_EXTENSIONS=1
             ;;
         -nc | --no-clean)
             FULL_REBUILD=0 
@@ -438,9 +371,6 @@ do
             OUT_DIR="$2"
             shift
             ;;
-        --optional-tvos)
-            OPT_WEAK_TVOS=1
-            ;;
         -v*)
             SET_VERBOSE_LEVEL_FROM_SWITCH $opt
             ;;
@@ -453,9 +383,6 @@ do
     esac
     shift
 done
-
-# Check required parameters
-[[ x$DO_EXTENSIONS$DO_WATCHOS == x00 ]] && FAILURE "You have to specify platform (watchos and/or extensions)"
 
 # Defaulting out & temporary folders
 if [ -z "$OUT_DIR" ]; then
@@ -484,8 +411,6 @@ $MD "${TMP_DIR}"
 #
 # Build
 #
-[[ x$DO_EXTENSIONS == x1 ]] && DO_PATCH_TARGETS
-[[ x$DO_EXTENSIONS == x1 ]] && DO_BUILD_APPEXT
 [[ x$DO_WATCHOS == x1    ]] && DO_BUILD_WATCHOS
 
 #

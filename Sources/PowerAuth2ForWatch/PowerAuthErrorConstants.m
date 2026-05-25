@@ -17,7 +17,7 @@
 // PA2_SHARED_SOURCE PowerAuth2ForWatch .
 // PA2_SHARED_SOURCE PowerAuth2ForExtensions .
 
-#import <PowerAuth2ForWatch/PowerAuthErrorConstants.h>
+#import "PowerAuthErrorConstants.h"
 #import "PA2PrivateConstants.h"
 
 #pragma mark - Error codes

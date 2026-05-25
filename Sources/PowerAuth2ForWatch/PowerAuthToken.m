@@ -17,9 +17,9 @@
 // PA2_SHARED_SOURCE PowerAuth2ForWatch .
 // PA2_SHARED_SOURCE PowerAuth2ForExtensions .
 
-#import <PowerAuth2ForWatch/PowerAuthToken.h>
-#import <PowerAuth2ForWatch/PowerAuthHttpHeader.h>
-#import <PowerAuth2ForWatch/PowerAuthLog.h>
+#import "PowerAuthToken.h"
+#import "PowerAuthHttpHeader.h"
+#import "PowerAuthLog.h"
 
 #import "PA2PrivateTokenInterfaces.h"
 #import "PA2PrivateTokenData.h"

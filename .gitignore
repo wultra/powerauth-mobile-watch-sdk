@@ -9,6 +9,11 @@
 build/
 DerivedData
 
+# Swift PM
+.build
+.swiftpm/xcode/xcuserdata/
+.swiftpm/xcode/package.xcworkspace/xcuserdata/
+
 ## Various settings
 *.pbxuser
 !default.pbxuser

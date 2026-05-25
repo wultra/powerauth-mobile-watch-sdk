@@ -14,26 +14,12 @@
  * limitations under the License.
  */
 
-// PA2_SHARED_SOURCE PowerAuth2ForWatch private
-// PA2_SHARED_SOURCE PowerAuth2ForExtensions private
-
-#import <PowerAuth2ForWatch/PowerAuthMacros.h>
+#import "PowerAuthOperationTask.h"
 
 /**
- The `PA2TokenDataLock` defines interface that allows token store
- acquire an exclusive access to shared token data.
+ The `PA2SimpleCancelable` object implements PowerAuthOperationTask
+ and holds simple information on whether the application canceled
+ the asynchronous operation.
  */
-@protocol PA2TokenDataLock <NSObject>
-
-/**
- Lock token store data and return whether the local cached context
- should be invalidated.
- */
-- (BOOL) lockTokenStore;
-
-/**
- Unlock token store data and mark that token store has been modified.
- */
-- (void) unlockTokenStore:(BOOL)contentModified;
-
+@interface PA2SimpleCancelable : NSObject<PowerAuthOperationTask>
 @end

@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-#import <PowerAuth2ForWatch/PowerAuthWatchSDK.h>
-#import <PowerAuth2ForWatch/PowerAuthKeychain.h>
-#import <PowerAuth2ForWatch/PowerAuthWCSessionManager.h>
-#import <PowerAuth2ForWatch/PowerAuthLog.h>
+#import "PowerAuthWatchSDK.h"
+#import "PowerAuthKeychain.h"
+#import "PowerAuthWCSessionManager.h"
+#import "PowerAuthLog.h"
 
 #import "PA2WatchSynchronizationService.h"
 #import "PA2WatchRemoteTokenProvider.h"

@@ -21,8 +21,8 @@
 #import "PA2PrivateMacros.h"
 #import "PA2SimpleCancelable.h"
 
-#import <PowerAuth2ForWatch/PowerAuthErrorConstants.h>
-#import <PowerAuth2ForWatch/PowerAuthConfiguration.h>
+#import "PowerAuthErrorConstants.h"
+#import "PowerAuthConfiguration.h"
 
 @implementation PA2WatchRemoteTokenProvider
 {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Wultra s.r.o.
+ * Copyright 2026 Wultra s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,20 @@
  * limitations under the License.
  */
 
-#import <PowerAuth2ForWatch/PowerAuthOperationTask.h>
+#import <XCTest/XCTest.h>
 
-/**
- The `PA2SimpleCancelable` object implements PowerAuthOperationTask
- and holds simple information on whether the application canceled
- the asynchronous operation.
- */
-@interface PA2SimpleCancelable : NSObject<PowerAuthOperationTask>
+#import <PowerAuth2ForWatch/PowerAuth2ForWatch.h>
+//@import PowerAuth2ForWatch;
+
+@interface PowerAuthConfigurationTests : XCTestCase
+@end
+
+@implementation PowerAuthConfigurationTests
+
+- (void) testConfiguration
+{
+    PowerAuthConfiguration * configuration = [[PowerAuthConfiguration alloc] initWithInstanceId:@"defaultInstance"];
+    XCTAssertEqualObjects(@"defaultInstance", configuration.instanceId);
+}
+
 @end

@@ -17,7 +17,7 @@
 #import "PA2ActivationStatus.h"
 #import "PA2PrivateMacros.h"
 
-#import <PowerAuth2ForWatch/PowerAuthLog.h>
+#import "PowerAuthLog.h"
 
 static const NSUInteger DATA_VER = 1;
 

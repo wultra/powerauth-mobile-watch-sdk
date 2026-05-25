@@ -27,10 +27,10 @@
 #import "PA2CoreCryptoUtils.h"
 #import "PA2CompositeTask.h"
 
-#import <PowerAuth2ForWatch/PowerAuthErrorConstants.h>
-#import <PowerAuth2ForWatch/PowerAuthKeychain.h>
-#import <PowerAuth2ForWatch/PowerAuthConfiguration.h>
-#import <PowerAuth2ForWatch/PowerAuthLog.h>
+#import "PowerAuthErrorConstants.h"
+#import "PowerAuthKeychain.h"
+#import "PowerAuthConfiguration.h"
+#import "PowerAuthLog.h"
 
 @implementation PA2PrivateTokenKeychainStore
 {
