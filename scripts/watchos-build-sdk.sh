@@ -283,8 +283,6 @@ function BUILD_LIBRARY
     LOG "  - Xcode $(GET_XCODE_VERSION --full)"
     LOG_LINE
 
-    BUILD_PATCH_ARCHITECTURES
-
     [[ x$FULL_REBUILD == x1 ]] && CLEAN_COMMAND
 
     local XCFW_PATH="${OUT_DIR}/${OUT_FW}.xcframework"
