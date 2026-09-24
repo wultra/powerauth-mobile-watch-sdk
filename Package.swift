@@ -10,7 +10,7 @@ let package = Package(
         .library(name: "PowerAuth2ForWatch", type: .dynamic, targets: ["PowerAuth2ForWatch"])
     ],
     dependencies: [
-        .package(url: "https://github.com/wultra/cc7", exact: "0.7.0-rc2")
+        .package(url: "https://github.com/wultra/cc7", exact: "0.7.2")
     ],
     targets: [
         
