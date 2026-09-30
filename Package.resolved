@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/wultra/cc7",
       "state" : {
-        "revision" : "0ea92b389c86eb5fa7201d058b544a835980a405",
-        "version" : "0.7.0-rc2"
+        "revision" : "9e894cb278cc41a412f1f4d21fef34f396de7f8a",
+        "version" : "0.7.2"
       }
     }
   ],

@@ -754,10 +754,7 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				OTHER_LDFLAGS = (
-					"-framework",
-					openssl,
-				);
+				OTHER_LDFLAGS = "-lopenssl";
 				SDKROOT = watchos;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				TVOS_DEPLOYMENT_TARGET = 12.0;
@@ -827,10 +824,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
-				OTHER_LDFLAGS = (
-					"-framework",
-					openssl,
-				);
+				OTHER_LDFLAGS = "-lopenssl";
 				SDKROOT = watchos;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				TVOS_DEPLOYMENT_TARGET = 12.0;
