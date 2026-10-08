@@ -12,11 +12,11 @@
 #  $VERBOSE_FOR_SCRIPT
 #     contains exact string as provided to SET_VERBOSE_LEVEL_FROM_SWITCH
 #  $VERBOSE_VARIANT1
-#     contains '-v' if VERBOSE==2, othherwise empty string
+#     contains '-v' if VERBOSE==2, otherwise empty string
 #  $VERBOSE_VARIANT2
-#     contains '-verbose' if VERBOSE==2, othherwise empty string
+#     contains '-verbose' if VERBOSE==2, otherwise empty string
 #  $VERBOSE_VARIANT3
-#     contains '--verbose' if VERBOSE==2, othherwise empty string
+#     contains '--verbose' if VERBOSE==2, otherwise empty string
 # -----------------------------------------------------------------------------
 set -e
 set +v
