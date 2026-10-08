@@ -190,6 +190,7 @@
             BOOL invalidPacket = YES;
             if ([status validatePacketData]) {
                 if ([status.command isEqualToString:PA2WCSessionPacket_CMD_SESSION_PUT]) {
+                    activationId = status.activationId;
                     [[PA2WatchSynchronizationService sharedInstance] updateActivationStatus:status forSessionInstanceId:_configuration.instanceId];
                     invalidPacket = NO;
                 }
