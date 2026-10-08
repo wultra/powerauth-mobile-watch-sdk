@@ -27,7 +27,6 @@ function USAGE
     echo ""
     echo "dangerous options:"
     echo "    --any-branch      allow deployment from any git branch"
-    echo "                      This version will not be merged to master"
     echo ""
     echo "    --skip-tag        skip version creation and tagging"
     echo "                      This is useful when publishing fails and"
@@ -43,18 +42,14 @@ function USAGE
 
 ###############################################################################
 # Config
-PODSPEC_EXT="PowerAuth2ForExtensions.podspec"
-PODSPEC_WOS="PowerAuth2ForWatch.podspec"
-INFO_PLIST_EXT="Sources/PowerAuth2ForExtensions/Info.plist"
-INFO_PLIST_WOS="Sources/PowerAuth2ForWatch/Info.plist"
+PODSPEC="PowerAuth2ForWatch.podspec"
+INFO_PLIST="Sources/PowerAuth2ForWatch/Info.plist"
 
-MASTER_BRANCH="main"
 DEV_BRANCH="develop"
 # Runtime global vars
 GIT_VALIDATE_DEVELOPMENT_BRANCH=1
 GIT_SKIP_TAGS=0
 GIT_ONLY_TAGS=0
-STANDARD_BRANCH=0
 SCRIPT_VERBOSE=
 POD_VERBOSE=
 
@@ -76,10 +71,8 @@ function VALIDATE_GIT_STATUS
         if [ "$GIT_CURRENT_BRANCH" != ${DEV_BRANCH} ]; then
             FAILURE "You have to be at '${DEV_BRANCH}' git branch."
         fi
-        STANDARD_BRANCH=1
     else
         WARNING "Going to publish '${VERSION}' from non-standard branch '${GIT_CURRENT_BRANCH}'"
-        STANDARD_BRANCH=0
     fi
 
     git fetch origin
@@ -105,23 +98,12 @@ function PREPARE_VERSIONING_FILES
 {
     PUSH_DIR "${SRC_ROOT}"
     ####
+    LOG "----- Generating ${PODSPEC}..."
+    sed -e "s/%DEPLOY_VERSION%/$VERSION/g" "${TOP}/templates/${PODSPEC}" > "$SRC_ROOT/${PODSPEC}"
+    LOG "----- Generating ${INFO_PLIST}..."
+    sed -e "s/%DEPLOY_VERSION%/$VERSION/g" "${TOP}/templates/PA2Watch-Info.plist" > "$SRC_ROOT/${INFO_PLIST}"
+    git add ${PODSPEC} ${INFO_PLIST}
 
-    if [[ $BUILD_TARGET_PLATFORM == 'extensions' ]]; then
-        # PowerAuth2ForExtensions
-        LOG "----- Generating ${PODSPEC_EXT}..."
-        sed -e "s/%DEPLOY_VERSION%/$VERSION/g" "${TOP}/templates/${PODSPEC_EXT}" > "$SRC_ROOT/${PODSPEC_EXT}"
-        LOG "----- Generating ${INFO_PLIST_EXT}..."
-        sed -e "s/%DEPLOY_VERSION%/$VERSION/g" "${TOP}/templates/PA2Ext-Info.plist" > "$SRC_ROOT/${INFO_PLIST_EXT}"
-        git add ${PODSPEC_EXT} ${INFO_PLIST_EXT}
-    else
-        # PowerAuth2ForWatch
-        LOG "----- Generating ${PODSPEC_WOS}..."
-        sed -e "s/%DEPLOY_VERSION%/$VERSION/g" "${TOP}/templates/${PODSPEC_WOS}" > "$SRC_ROOT/${PODSPEC_WOS}"
-        LOG "----- Generating ${INFO_PLIST_WOS}..."
-        sed -e "s/%DEPLOY_VERSION%/$VERSION/g" "${TOP}/templates/PA2Watch-Info.plist" > "$SRC_ROOT/${INFO_PLIST_WOS}"
-        git add ${PODSPEC_WOS} ${INFO_PLIST_WOS}
-    fi
-    
     local TAG_MESSAGE="Version $VERSION"
 
     LOG "----- Commiting versioning files..."
@@ -176,39 +158,18 @@ function DEPLOY_BUILD
     PUSH_DIR "${SRC_ROOT}"
     ####
     
-    if [[ $BUILD_TARGET_PLATFORM == 'extensions' ]]; then
-        LOG "----- Publishing ${PODSPEC_EXT} to CocoaPods..."
-        pod $POD_VERBOSE trunk push ${PODSPEC_EXT}
-    else
-        LOG "----- Publishing ${PODSPEC_WOS} to CocoaPods..."
-        pod $POD_VERBOSE trunk push ${PODSPEC_WOS}
-    fi
-    
+    LOG_LINE
+    LOG "Going to publish ${PODSPEC} to CocoaPods. In case of failure"
+    LOG "then please try to run the publishing manually: "
+    LOG ""
+    LOG "   pod trunk push ${PODSPEC}"
+    LOG ""
+    LOG_LINE
+
+    LOG "----- Publishing ${PODSPEC} to CocoaPods..."
+    pod $POD_VERBOSE trunk push ${PODSPEC}
     ####
     POP_DIR
-}
-
-# -----------------------------------------------------------------------------
-# Merges recent changes to the 'master' branch
-# -----------------------------------------------------------------------------
-function MERGE_TO_MASTER
-{
-    if [ x$STANDARD_BRANCH == x0 ]; then
-        LOG "----- OK, but not merged to '${MASTER_BRANCH}'"
-    else
-        PUSH_DIR "${SRC_ROOT}"
-        ####
-        LOG "----- Merging to '${MASTER_BRANCH}'..."
-        git fetch origin
-        git checkout ${MASTER_BRANCH}
-        git rebase origin/${DEV_BRANCH}
-        git push
-        git checkout ${DEV_BRANCH}
-        ####
-        POP_DIR
-        LOG "----- OK"
-    fi
-    exit 0
 }
 
 
@@ -261,5 +222,5 @@ VALIDATE_GIT_STATUS
 VALIDATE_BEFORE_PUBLISH
 PUSH_VERSIONING_FILES
 DEPLOY_BUILD
-MERGE_TO_MASTER
 
+EXIT_SUCCESS -l

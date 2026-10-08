@@ -22,7 +22,6 @@ set +v
 TOP=$(dirname $0)
 source "${TOP}/common-functions.sh"
 source "${TOP}/config-apple.sh"
-source "${TOP}/config-apple-ext.sh"
 SRC_ROOT="`( cd \"$TOP/..\" && pwd )`"
 
 #
